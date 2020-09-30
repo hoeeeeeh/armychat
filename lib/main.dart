@@ -50,14 +50,39 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  final idController = TextEditingController();
-  final passwdController = TextEditingController();
+  final idController = TextEditingController(text: '아이디를 입력해주세요');
+  final passwdController = TextEditingController(text: '비밀번호를 입력해주세요');
 
   String id = '아직 아이디가 입력되지 않았습니다.';
   String passwd = '아직 비밀번호가 입력되지 않았습니다.';
 
+  void _alert() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        // return object of type Dialog
+        return AlertDialog(
+          title: new Text("입력"),
+          content: new Text("아이디 혹은 비밀번호를 입력해주세요"),
+          actions: <Widget>[
+            new FlatButton(
+              child: new Text("닫기"),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   void _login() {
     setState(() {
+      if (idController.text == "" || passwdController.text == "") {
+        _alert();
+        return;
+      }
       id = idController.text;
       passwd = passwdController.text;
     });
@@ -99,11 +124,17 @@ class _MyHomePageState extends State<MyHomePage> {
               // horizontal).
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
-                Text('육군 규정 상담 챗봇, "아미챗봇" '),
+                Container(
+                  padding: EdgeInsets.fromLTRB(20, 20, 20, 20),
+                  child: Text('육군 규정 상담 챗봇, "아미챗봇" '),
+                ),
                 TextFormField(
                     controller: idController,
                     keyboardType: TextInputType.emailAddress,
                     decoration: InputDecoration(border: OutlineInputBorder())),
+                Padding(
+                  padding: EdgeInsets.all(1),
+                ),
                 TextFormField(
                     controller: passwdController,
                     keyboardType: TextInputType.visiblePassword,
