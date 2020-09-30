@@ -1,39 +1,7 @@
-import 'package:army_chatbot/signin.dart';
 import 'package:flutter/material.dart';
 
-void main() {
-  runApp(MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  // This widget is the root of your application.
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Army ChatBot',
-      theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // Try running your application with "flutter run". You'll see the
-        // application has a blue toolbar. Then, without quitting the app, try
-        // changing the primarySwatch below to Colors.green and then invoke
-        // "hot reload" (press "r" in the console where you ran "flutter run",
-        // or simply save your changes to "hot reload" in a Flutter IDE).
-        // Notice that the counter didn't reset back to zero; the application
-        // is not restarted.
-        primarySwatch: Colors.blue,
-        // This makes the visual density adapt to the platform that you run
-        // the app on. For desktop platforms, the controls will be smaller and
-        // closer together (more dense) than on mobile platforms.
-        visualDensity: VisualDensity.adaptivePlatformDensity,
-      ),
-      home: MyHomePage(title: 'Army ChatBot'),
-    );
-  }
-}
-
-class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key, this.title}) : super(key: key);
+class SignIn extends StatefulWidget {
+  SignIn({Key key, this.title}) : super(key: key);
 
   // This widget is the home page of your application. It is stateful, meaning
   // that it has a State object (defined below) that contains fields that affect
@@ -47,15 +15,22 @@ class MyHomePage extends StatefulWidget {
   final String title;
 
   @override
-  _MyHomePageState createState() => _MyHomePageState();
+  _SignInState createState() => _SignInState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _SignInState extends State<SignIn> {
   final idController = TextEditingController(text: '아이디를 입력해주세요');
   final passwdController = TextEditingController(text: '비밀번호를 입력해주세요');
+  final emailController = TextEditingController(text: '이메일을 입력해주세요');
+  final nameController = TextEditingController(text: '이름을 입력해주세요');
+  final phoneController = TextEditingController(text: '핸드폰 번호를 입력해주세요');
+  final armyNumController =
+      TextEditingController(text: '군번을 입력해주세요 ("-"을 제외하고 입력해주세요.)');
 
   String id = '아직 아이디가 입력되지 않았습니다.';
   String passwd = '아직 비밀번호가 입력되지 않았습니다.';
+
+  bool checked = false;
 
   void _alert() {
     showDialog(
@@ -78,14 +53,19 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  void _login() {
+  void _confirm() {
     setState(() {
       if (idController.text == "" || passwdController.text == "") {
         _alert();
         return;
       }
-      id = idController.text;
-      passwd = passwdController.text;
+      Navigator.pop(context);
+    });
+  }
+
+  bool _isChecked(bool value) {
+    setState(() {
+      checked = !checked;
     });
   }
 
@@ -103,7 +83,8 @@ class _MyHomePageState extends State<MyHomePage> {
           // the App.build method, and use it to set our appbar title.
           title: Text(widget.title ?? 'ARMY CHATBOT'),
         ),
-        body: Center(
+        body: SingleChildScrollView(
+            child: Center(
           child: Container(
             padding: EdgeInsets.fromLTRB(20, 20, 20, 20),
             // Center is a layout widget. It takes a single child and positions it
@@ -126,10 +107,44 @@ class _MyHomePageState extends State<MyHomePage> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
                 Container(
-                  padding: EdgeInsets.fromLTRB(20, 20, 20, 20),
-                  child: Text('육군 규정 상담 챗봇, "아미챗봇" '),
+                  padding: EdgeInsets.fromLTRB(20, 0, 20, 10),
+                  child: Text('회원가입'),
+                ),
+                Padding(
+                  padding: EdgeInsets.all(10),
+                ),
+                SizedBox(
+                  height: 400,
+                  child: SingleChildScrollView(
+                    child: Column(children: <Widget>[
+                      Container(
+                          height: 350,
+                          width: 400,
+                          decoration:
+                              BoxDecoration(border: Border.all(width: 1)),
+                          child: Center(
+                              child: Text(
+                            '약관\n약관입니다. 불만있으세요?\n약관에 불만이 있으시다면 제 알바 아닙니다.',
+                            textAlign: TextAlign.center,
+                          ))),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          Text('약관에 동의하십니까?'),
+                          Checkbox(
+                            value: checked,
+                            onChanged: _isChecked,
+                          )
+                        ],
+                      )
+                    ]),
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.all(10),
                 ),
                 TextFormField(
+                    // id 입력
                     controller: idController,
                     keyboardType: TextInputType.emailAddress,
                     decoration: InputDecoration(border: OutlineInputBorder())),
@@ -137,37 +152,54 @@ class _MyHomePageState extends State<MyHomePage> {
                   padding: EdgeInsets.all(1),
                 ),
                 TextFormField(
+                    // passwd 입력
                     controller: passwdController,
                     keyboardType: TextInputType.visiblePassword,
                     obscureText: true,
                     decoration: InputDecoration(border: OutlineInputBorder())),
-                Center(
-                    child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: <Widget>[
-                      RaisedButton(
-                        child: Text('로그인'),
-                        onPressed: _login,
-                      ),
-                      Padding(
-                        padding: EdgeInsets.only(left: 10),
-                      ),
-                      RaisedButton(
-                          child: Text('회원가입'),
-                          onPressed: () {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => SignIn()));
-                          })
-                    ])),
+                Padding(
+                  padding: EdgeInsets.all(1),
+                ),
+                TextFormField(
+                    // 이메일주소 입력
+                    controller: emailController,
+                    keyboardType: TextInputType.emailAddress,
+                    decoration: InputDecoration(border: OutlineInputBorder())),
+                Padding(
+                  padding: EdgeInsets.all(1),
+                ),
+                TextFormField(
+                    // 이름
+                    controller: nameController,
+                    keyboardType: TextInputType.name,
+                    decoration: InputDecoration(border: OutlineInputBorder())),
+                Padding(
+                  padding: EdgeInsets.all(1),
+                ),
+                TextFormField(
+                    // 핸드폰 번호 입력
+                    controller: phoneController,
+                    keyboardType: TextInputType.phone,
+                    decoration: InputDecoration(border: OutlineInputBorder())),
+                Padding(
+                  padding: EdgeInsets.all(1),
+                ),
+                TextFormField(
+                    // 군번 입력
+                    controller: armyNumController,
+                    keyboardType: TextInputType.text,
+                    decoration: InputDecoration(border: OutlineInputBorder())),
+                RaisedButton(
+                  child: Text('완료'),
+                  onPressed: _confirm,
+                ),
                 Text('Your ID: $id'),
                 Text('Your PW: $passwd'),
               ],
             ),
           ),
         )
-        // This trailing comma makes auto-formatting nicer for build methods.
-        );
+            // This trailing comma makes auto-formatting nicer for build methods.
+            ));
   }
 }
