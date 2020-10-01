@@ -1,3 +1,4 @@
+import 'main.dart';
 import 'package:flutter/material.dart';
 
 class SignIn extends StatefulWidget {
@@ -19,27 +20,35 @@ class SignIn extends StatefulWidget {
 }
 
 class _SignInState extends State<SignIn> {
-  final idController = TextEditingController(text: '아이디를 입력해주세요');
-  final passwdController = TextEditingController(text: '비밀번호를 입력해주세요');
-  final emailController = TextEditingController(text: '이메일을 입력해주세요');
-  final nameController = TextEditingController(text: '이름을 입력해주세요');
-  final phoneController = TextEditingController(text: '핸드폰 번호를 입력해주세요');
-  final armyNumController =
-      TextEditingController(text: '군번을 입력해주세요 ("-"을 제외하고 입력해주세요.)');
+  final idController = TextEditingController();
+  final passwdController = TextEditingController();
+  final emailController = TextEditingController();
+  final nameController = TextEditingController();
+  final phoneController = TextEditingController();
+  final armyNumController = TextEditingController();
 
   String id = '아직 아이디가 입력되지 않았습니다.';
   String passwd = '아직 비밀번호가 입력되지 않았습니다.';
 
   bool checked = false;
 
-  void _alert() {
+  void _alert(String output) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         // return object of type Dialog
         return AlertDialog(
-          title: new Text("입력"),
-          content: new Text("아이디 혹은 비밀번호를 입력해주세요"),
+          title: new Text("알림"),
+          content: new Container(
+            width: 200,
+            height: 60,
+            child: new Center(
+              child: new Text(
+                output ?? 'defalut value',
+                textAlign: TextAlign.center,
+              ),
+            ),
+          ),
           actions: <Widget>[
             new FlatButton(
               child: new Text("닫기"),
@@ -53,17 +62,60 @@ class _SignInState extends State<SignIn> {
     );
   }
 
-  void _confirm() {
-    setState(() {
-      if (idController.text == "" || passwdController.text == "") {
-        _alert();
-        return;
-      }
-      Navigator.pop(context);
-    });
+  bool isEmpty(String thing) {
+    if (thing == "")
+      return true;
+    else
+      return false;
   }
 
-  bool _isChecked(bool value) {
+  void _confirm() {
+    String output = '';
+    bool empty = false;
+    if (!checked) {
+      _alert('약관에 동의해주세요!');
+      return;
+    }
+    if (isEmpty(idController.text)) {
+      output = output + '아이디';
+      empty = true;
+    }
+    if (isEmpty(passwdController.text)) {
+      if (empty) output = output + ',';
+      output = output + '비밀번호';
+      empty = true;
+    }
+    if (isEmpty(emailController.text)) {
+      if (empty) output = output + ',';
+      output = output + '이메일';
+      empty = true;
+    }
+    if (nameController.text == '') {
+      if (empty) output = output + ',';
+      output = output + '이름';
+      empty = true;
+    }
+    if (phoneController.text == '') {
+      if (empty) output = output + ',';
+      output = output + '핸드폰';
+      empty = true;
+    }
+    if (armyNumController.text == '') {
+      if (empty) output = output + ',';
+      output = output + '군번';
+      empty = true;
+    }
+    if (empty) {
+      output = output + '\n은 필수 기재 항목입니다.';
+      _alert(output);
+    } else {
+      Navigator.pop(context);
+      //idController.text = ; 나중에 회원가입하면 자동으로 로그인 창에 아이디,비번 띄워주는 옵션
+      _alert('정상적으로 회원가입이 되었습니다.');
+    }
+  }
+
+  void _isChecked(bool value) {
     setState(() {
       checked = !checked;
     });
@@ -114,20 +166,24 @@ class _SignInState extends State<SignIn> {
                   padding: EdgeInsets.all(10),
                 ),
                 SizedBox(
-                  height: 400,
-                  child: SingleChildScrollView(
-                    child: Column(children: <Widget>[
-                      Container(
-                          height: 350,
-                          width: 400,
-                          decoration:
-                              BoxDecoration(border: Border.all(width: 1)),
-                          child: Center(
-                              child: Text(
-                            '약관\n약관입니다. 불만있으세요?\n약관에 불만이 있으시다면 제 알바 아닙니다.',
-                            textAlign: TextAlign.center,
-                          ))),
-                      Row(
+                  height: 450,
+                  child: Column(children: <Widget>[
+                    Container(
+                        height: 400,
+                        width: 400,
+                        decoration: BoxDecoration(border: Border.all(width: 1)),
+                        child: Container(
+                            height: 450,
+                            child: SingleChildScrollView(
+                              child: Center(
+                                  child: Text(
+                                '약관\n 약관입니다. 불만있으세요?\n 약관에 불만이 있으시다면 제 알바 아닙니다.\n 그래도 여기까지 읽으시다니 대단히시군요.\n 사실 이 약관에 동의하시면 당신의 개인정보는 \n 흔한 중국인 업자에게 개당 500원꼴로 팔려나갔을겁니다.\n스크롤\n스크롤\n스크롤\n스크롤\n스크롤\n스크롤\n스크롤\n스크롤\n스크롤\n스크롤\n스크롤\n스크롤\n스크롤\n스크롤\n스크롤\n스크롤\n스크롤\n스크롤\n스크롤\n스크롤\n스크롤\n스크롤\n스크롤\n스크롤\n스크롤\n스크롤\n스크롤\n스크롤\n스크롤\n스크롤\n스크롤\n스크롤\n스크롤\n스크롤\n스크롤\n스크롤\n스크롤\n스크롤\n스크롤\n스크롤\n스크롤\n스크롤\n스크롤\n스크롤\n스크롤\n스크롤\n스크롤\n스크롤\n스크롤\n스크롤\n스크롤\n스크롤\n스크롤\n스크롤\n스크롤\n스크롤\n스크롤\n스크롤\n스크롤\n스크롤\n스크롤\n스크롤\n스크롤\n스크롤\n스크롤 ㅋㅋ',
+                                textAlign: TextAlign.center,
+                              )),
+                            ))),
+                    Container(
+                      height: 50,
+                      child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: <Widget>[
                           Text('약관에 동의하십니까?'),
@@ -136,9 +192,9 @@ class _SignInState extends State<SignIn> {
                             onChanged: _isChecked,
                           )
                         ],
-                      )
-                    ]),
-                  ),
+                      ),
+                    )
+                  ]),
                 ),
                 Padding(
                   padding: EdgeInsets.all(10),
@@ -147,40 +203,76 @@ class _SignInState extends State<SignIn> {
                     // id 입력
                     controller: idController,
                     keyboardType: TextInputType.emailAddress,
-                    decoration: InputDecoration(border: OutlineInputBorder())),
+                    maxLength: 10,
+                    decoration: InputDecoration(
+                        hintText: '아이디를 입력해주세요',
+                        suffixIcon: IconButton(
+                          onPressed: () => idController.clear(),
+                          icon: Icon(Icons.clear),
+                        ),
+                        border: OutlineInputBorder())),
                 Padding(
                   padding: EdgeInsets.all(1),
                 ),
                 TextFormField(
                     // passwd 입력
                     controller: passwdController,
+                    maxLines: 1,
+                    maxLength: 15,
                     keyboardType: TextInputType.visiblePassword,
                     obscureText: true,
-                    decoration: InputDecoration(border: OutlineInputBorder())),
+                    decoration: InputDecoration(
+                        hintText: '비밀번호를 입력해주세요',
+                        suffixIcon: IconButton(
+                          onPressed: () => passwdController.clear(),
+                          icon: Icon(Icons.clear),
+                        ),
+                        border: OutlineInputBorder())),
                 Padding(
                   padding: EdgeInsets.all(1),
                 ),
                 TextFormField(
                     // 이메일주소 입력
                     controller: emailController,
+                    maxLength: 30,
                     keyboardType: TextInputType.emailAddress,
-                    decoration: InputDecoration(border: OutlineInputBorder())),
+                    decoration: InputDecoration(
+                        hintText: '이메일을 입력해주세요',
+                        suffixIcon: IconButton(
+                          onPressed: () => emailController.clear(),
+                          icon: Icon(Icons.clear),
+                        ),
+                        border: OutlineInputBorder())),
                 Padding(
                   padding: EdgeInsets.all(1),
                 ),
                 TextFormField(
                     // 이름
+                    maxLength: 10,
                     controller: nameController,
                     keyboardType: TextInputType.name,
-                    decoration: InputDecoration(border: OutlineInputBorder())),
+                    decoration: InputDecoration(
+                        hintText: '이름을 입력해주세요',
+                        suffixIcon: IconButton(
+                          onPressed: () => nameController.clear(),
+                          icon: Icon(Icons.clear),
+                        ),
+                        border: OutlineInputBorder())),
                 Padding(
                   padding: EdgeInsets.all(1),
                 ),
                 TextFormField(
                     // 핸드폰 번호 입력
                     controller: phoneController,
-                    keyboardType: TextInputType.phone,
-                    decoration: InputDecoration(border: OutlineInputBorder())),
+                    keyboardType: TextInputType.number,
+                    maxLength: 10,
+                    decoration: InputDecoration(
+                        hintText: '핸드폰 번호("-" 제외)를 입력해주세요',
+                        suffixIcon: IconButton(
+                          onPressed: () => phoneController.clear(),
+                          icon: Icon(Icons.clear),
+                        ),
+                        border: OutlineInputBorder())),
                 Padding(
                   padding: EdgeInsets.all(1),
                 ),
@@ -188,7 +280,13 @@ class _SignInState extends State<SignIn> {
                     // 군번 입력
                     controller: armyNumController,
                     keyboardType: TextInputType.text,
-                    decoration: InputDecoration(border: OutlineInputBorder())),
+                    decoration: InputDecoration(
+                        hintText: '군번을 입력해주세요 ("-"을 제외하고 입력해주세요.)',
+                        suffixIcon: IconButton(
+                          onPressed: () => armyNumController.clear(),
+                          icon: Icon(Icons.clear),
+                        ),
+                        border: OutlineInputBorder())),
                 RaisedButton(
                   child: Text('완료'),
                   onPressed: _confirm,

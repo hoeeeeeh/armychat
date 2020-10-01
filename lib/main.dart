@@ -51,8 +51,8 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  final idController = TextEditingController(text: '아이디를 입력해주세요');
-  final passwdController = TextEditingController(text: '비밀번호를 입력해주세요');
+  final idController = TextEditingController();
+  final passwdController = TextEditingController();
 
   String id = '아직 아이디가 입력되지 않았습니다.';
   String passwd = '아직 비밀번호가 입력되지 않았습니다.';
@@ -132,7 +132,13 @@ class _MyHomePageState extends State<MyHomePage> {
                 TextFormField(
                     controller: idController,
                     keyboardType: TextInputType.emailAddress,
-                    decoration: InputDecoration(border: OutlineInputBorder())),
+                    decoration: InputDecoration(
+                        hintText: '아이디를 입력해주세요',
+                        suffixIcon: IconButton(
+                          onPressed: () => idController.clear(),
+                          icon: Icon(Icons.clear),
+                        ),
+                        border: OutlineInputBorder())),
                 Padding(
                   padding: EdgeInsets.all(1),
                 ),
@@ -140,7 +146,13 @@ class _MyHomePageState extends State<MyHomePage> {
                     controller: passwdController,
                     keyboardType: TextInputType.visiblePassword,
                     obscureText: true,
-                    decoration: InputDecoration(border: OutlineInputBorder())),
+                    decoration: InputDecoration(
+                        hintText: '비밀번호를 입력해주세요',
+                        suffixIcon: IconButton(
+                          onPressed: () => idController.clear(),
+                          icon: Icon(Icons.clear),
+                        ),
+                        border: OutlineInputBorder())),
                 Center(
                     child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
