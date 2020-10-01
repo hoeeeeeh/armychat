@@ -1,8 +1,13 @@
 # army_chatbot
 
-A new Flutter project.
+육군 규정 상담 챗봇 
 
 ## Getting Started
+
+2020.09.30 수요일
+-로그인 화면 살짝?
+-
+https://flutter-ko.dev/docs/cookbook/navigation
 
 This project is a starting point for a Flutter application.
 
