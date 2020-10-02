@@ -1,5 +1,5 @@
+import 'package:army_chatbot/counselor.dart';
 import 'package:army_chatbot/signin.dart';
-import 'package:army_chatbot/user.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -52,25 +52,11 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  TextEditingController idController;
-  TextEditingController passwdController;
+  final idController = TextEditingController();
+  final passwdController = TextEditingController();
 
-  String id;
-  String passwd;
-
-  void initState() {
-    super.initState();
-    id = '아직 아이디가 입력되지 않았습니다.';
-    passwd = '아직 비밀번호가 입력되지 않았습니다.';
-    idController = TextEditingController();
-    passwdController = TextEditingController();
-  }
-
-  void dispose() {
-    idController.dispose();
-    passwdController.dispose();
-    super.dispose();
-  }
+  String id = '아직 아이디가 입력되지 않았습니다.';
+  String passwd = '아직 비밀번호가 입력되지 않았습니다.';
 
   void _alert() {
     showDialog(
@@ -98,11 +84,6 @@ class _MyHomePageState extends State<MyHomePage> {
       if (idController.text == "" || passwdController.text == "") {
         _alert();
         return;
-      }
-
-      if (idController.text == "admin" && passwdController.text == "admin") {
-        Navigator.push(
-            context, MaterialPageRoute(builder: (context) => User()));
       }
       id = idController.text;
       passwd = passwdController.text;
@@ -178,9 +159,14 @@ class _MyHomePageState extends State<MyHomePage> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: <Widget>[
                       RaisedButton(
-                        child: Text('로그인'),
-                        onPressed: _login,
-                      ),
+                          child: Text('로그인'),
+                          onPressed: () {
+                            _login();
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => CounSel()));
+                          }),
                       Padding(
                         padding: EdgeInsets.only(left: 10),
                       ),
@@ -193,8 +179,8 @@ class _MyHomePageState extends State<MyHomePage> {
                                     builder: (context) => SignIn()));
                           })
                     ])),
-                Text('Your ID: $id'),
-                Text('Your PW: $passwd'),
+                //Text('Your ID: $id'),
+                //Text('Your PW: $passwd'),
               ],
             ),
           ),
