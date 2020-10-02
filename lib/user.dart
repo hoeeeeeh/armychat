@@ -1,40 +1,59 @@
 import 'package:flutter/material.dart';
+import 'setting.dart' as setting;
 
-class User extends StatefulWidget {
-  User({Key key, this.title}) : super(key: key);
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
+class UserInfo extends StatefulWidget {
+  UserInfo({Key key, this.title}) : super(key: key);
   final String title;
 
   @override
-  _UserState createState() => _UserState();
+  _UserInfoState createState() => _UserInfoState();
 }
 
-class _UserState extends State<User> {
+class _UserInfoState extends State<UserInfo> {
+  int _selectedIndex = 0;
+
+  final List<Widget> _widgetArray = <Widget>[
+    setting.A(),
+    setting.B(),
+    setting.Setting(),
+  ];
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
     return Scaffold(
-        appBar: AppBar(
-          // Here we take the value from the MyHomePage object that was created by
-          // the App.build method, and use it to set our appbar title.
-          title: Text(widget.title ?? 'ARMY CHATBOT'),
-        ),
-        body: Container()
-        // This trailing comma makes auto-formatting nicer for build methods.
-        );
+      /*
+      appBar: AppBar(
+        title: Text(widget.title ?? 'default value'),
+      ),
+      */
+      body: Center(
+        child: _widgetArray.elementAt(_selectedIndex),
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        items: <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(Icons.directions_car),
+            title: Text('Car'),
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.chat_bubble),
+            title: Text('Chat'),
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.settings),
+            title: Text('Setting'),
+          ),
+        ],
+        currentIndex: _selectedIndex,
+        selectedItemColor: Colors.amber[800],
+        onTap: _onItemTapped,
+      ),
+    );
   }
 }

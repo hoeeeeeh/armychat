@@ -1,5 +1,6 @@
 import 'package:army_chatbot/counselor.dart';
 import 'package:army_chatbot/signin.dart';
+import 'package:army_chatbot/user.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -81,10 +82,18 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void _login() {
     setState(() {
+      if (idController.text == "admin" && passwdController.text == "admin") {
+        Navigator.push(
+            context, MaterialPageRoute(builder: (context) => UserInfo()));
+      } else {
+        Navigator.push(
+            context, MaterialPageRoute(builder: (context) => CounSel()));
+      }
       if (idController.text == "" || passwdController.text == "") {
         _alert();
         return;
       }
+
       id = idController.text;
       passwd = passwdController.text;
     });
@@ -162,10 +171,6 @@ class _MyHomePageState extends State<MyHomePage> {
                           child: Text('로그인'),
                           onPressed: () {
                             _login();
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => CounSel()));
                           }),
                       Padding(
                         padding: EdgeInsets.only(left: 10),
