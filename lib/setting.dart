@@ -33,7 +33,9 @@ class _SettingState extends State<Setting> {
           // the App.build method, and use it to set our appbar title.
           title: Text(widget.title ?? 'ARMY CHATBOT'),
         ),
-        body: Container()
+        body: Container(
+          child: Text('Setting'),
+        )
         // This trailing comma makes auto-formatting nicer for build methods.
         );
   }
@@ -70,7 +72,7 @@ class _AState extends State<A> {
         appBar: AppBar(
           // Here we take the value from the MyHomePage object that was created by
           // the App.build method, and use it to set our appbar title.
-          title: Text(widget.title ?? 'ARMY CHATBOT'),
+          title: Text(widget.title ?? 'CAR'),
         ),
         body: Container()
         // This trailing comma makes auto-formatting nicer for build methods.
@@ -109,7 +111,7 @@ class _BState extends State<B> {
         appBar: AppBar(
           // Here we take the value from the MyHomePage object that was created by
           // the App.build method, and use it to set our appbar title.
-          title: Text(widget.title ?? 'ARMY CHATBOT'),
+          title: Text(widget.title ?? 'CHAT'),
         ),
         body: Container()
         // This trailing comma makes auto-formatting nicer for build methods.

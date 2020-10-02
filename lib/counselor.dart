@@ -79,7 +79,7 @@ class _CounSelState extends State<CounSel> {
         appBar: AppBar(
           // Here we take the value from the MyHomePage object that was created by
           // the App.build method, and use it to set our appbar title.
-          title: Text(widget.title ?? 'ARMY CHATBOT'),
+          title: Text(widget.title ?? '육군 법률 상담소'),
         ),
         body: SingleChildScrollView(
             child: Center(

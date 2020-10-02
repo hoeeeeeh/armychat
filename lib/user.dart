@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'setting.dart' as setting;
+import 'counselor.dart' as counselor;
 
 class UserInfo extends StatefulWidget {
   UserInfo({Key key, this.title}) : super(key: key);
@@ -14,7 +15,7 @@ class _UserInfoState extends State<UserInfo> {
 
   final List<Widget> _widgetArray = <Widget>[
     setting.A(),
-    setting.B(),
+    counselor.CounSel(),
     setting.Setting(),
   ];
 
