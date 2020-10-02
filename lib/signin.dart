@@ -20,17 +20,44 @@ class SignIn extends StatefulWidget {
 }
 
 class _SignInState extends State<SignIn> {
-  final idController = TextEditingController();
-  final passwdController = TextEditingController();
-  final emailController = TextEditingController();
-  final nameController = TextEditingController();
-  final phoneController = TextEditingController();
-  final armyNumController = TextEditingController();
+  TextEditingController idController;
+  TextEditingController passwdController;
+  TextEditingController emailController;
+  TextEditingController nameController;
+  TextEditingController phoneController;
+  TextEditingController armyNumController;
 
-  String id = '아직 아이디가 입력되지 않았습니다.';
-  String passwd = '아직 비밀번호가 입력되지 않았습니다.';
+  String id;
+  String passwd;
 
-  bool checked = false;
+  bool checked;
+
+  void initState() {
+    super.initState();
+
+    id = '아직 아이디가 입력되지 않았습니다.';
+    passwd = '아직 비밀번호가 입력되지 않았습니다.';
+    idController = TextEditingController();
+    passwdController = TextEditingController();
+    emailController = TextEditingController();
+    nameController = TextEditingController();
+    phoneController = TextEditingController();
+    armyNumController = TextEditingController();
+
+    id = '아직 아이디가 입력되지 않았습니다.';
+    passwd = '아직 비밀번호가 입력되지 않았습니다.';
+    checked = false;
+  }
+
+  void dispose() {
+    idController.dispose();
+    passwdController.dispose();
+    emailController.dispose();
+    nameController.dispose();
+    phoneController.dispose();
+    armyNumController.dispose();
+    super.dispose();
+  }
 
   void _alert(String output) {
     showDialog(
