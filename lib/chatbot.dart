@@ -20,8 +20,155 @@ class ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
   final GlobalKey<AnimatedListState> _listKey = GlobalKey();
 
   // 서버
-  static const String SRV_URL = "https://www.naver.cqweqwe";
+  static const String SRV_URL = "http://dc5b82ffa192.ngrok.io";
 
+  //텍스트필드 제어용 컨트롤러
+  TextEditingController _queryController = TextEditingController();
+
+  // 텍스트필드에 입력된 데이터의 존재 여부
+  bool _isComposing = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        centerTitle: true,
+        title: Text("챗봇 상담소"),
+      ),
+      body: Stack(
+        children: <Widget>[
+          AnimatedList(
+              // key to call remove and insert from anywhere
+              key: _listKey,
+              initialItemCount: _message.length,
+              itemBuilder:
+                  (BuildContext context, int index, Animation animation) {
+                return _buildItem(_message[index], animation, index);
+              }),
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: TextField(
+              decoration: InputDecoration(
+                icon: Icon(
+                  Icons.message,
+                  color: Colors.greenAccent,
+                ),
+                hintText: "Hello",
+              ),
+              controller: _queryController,
+              textInputAction: TextInputAction.send,
+              onSubmitted: (msg) {
+                this._getResponse();
+              },
+            ),
+          )
+        ],
+      ),
+    );
+  }
+
+  http.Client _getClient() {
+    return http.Client();
+  }
+
+  void _getResponse() {
+    if (_queryController.text.length > 0) {
+      this._insertSingleItem(ChatMessage(
+        text: _queryController.text,
+        animationController: AnimationController(
+          duration: Duration(milliseconds: 700),
+          vsync: this,
+        ),
+      ));
+      var client = _getClient();
+      try {
+        client.post(
+          SRV_URL,
+          body: {"query": _queryController.text},
+        )..then((response) {
+            Map<String, dynamic> data = jsonDecode(response.body);
+            _insertSingleItem(data['response'] + "<bot>");
+          });
+      } catch (e) {
+        print("Failed -> $e");
+      } finally {
+        client.close();
+        _queryController.clear();
+      }
+    }
+  }
+
+  void _insertSingleItem(ChatMessage message) {
+    _message.add(message);
+    _listKey.currentState.insertItem(_message.length - 1);
+  }
+
+  Widget _buildItem(ChatMessage item, Animation animation, int index) {
+    String chatcontent = item.text;
+    bool mine = chatcontent.endsWith("<bot>");
+    return SizeTransition(
+        sizeFactor: animation,
+        child: Padding(
+          padding: EdgeInsets.only(top: 10),
+          child: Container(
+              alignment: mine ? Alignment.topLeft : Alignment.topRight,
+              child: Bubble(
+                child: Text(chatcontent.replaceAll("<bot>", "")),
+                color: mine ? Colors.blue : Colors.indigo,
+                padding: BubbleEdges.all(10),
+              )),
+        ));
+  }
+}
+
+class ChatMessage extends StatelessWidget {
+  final String text; // 출력할 메시지
+  final AnimationController animationController; // 리스트뷰에 등록될 때 보여질 효과
+
+  ChatMessage({this.text, this.animationController});
+
+  @override
+  Widget build(BuildContext context) {
+    // 위젯에 애니메이션을 발생하기 위해 SizeTransition을 추가
+    return SizeTransition(
+      // 사용할 애니메이션 효과 설정
+      sizeFactor:
+          CurvedAnimation(parent: animationController, curve: Curves.easeOut),
+      axisAlignment: 0.0,
+      // 리스트뷰에 추가될 컨테이너 위젯
+      child: Container(
+        margin: const EdgeInsets.symmetric(vertical: 10.0),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Container(
+              margin: const EdgeInsets.only(right: 16.0),
+              // 사용자명의 첫번째 글자를 서클 아바타로 표시
+              child: CircleAvatar(child: Text(header.userName[0])),
+            ),
+            Expanded(
+              // 컬럼 추가
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  // 사용자명을 subhead 테마로 출력
+                  Text(header.userName,
+                      style: Theme.of(context).textTheme.subhead),
+                  // 입력받은 메시지 출력
+                  Container(
+                    margin: const EdgeInsets.only(top: 5.0),
+                    child: Text(text),
+                  ),
+                ],
+              ),
+            )
+          ],
+        ),
+      ),
+    );
+  }
+}
+/*
   // 텍스트필드 제어용 컨트롤러
   final TextEditingController _textController = TextEditingController();
 
@@ -252,3 +399,5 @@ class ChatMessage extends StatelessWidget {
     );
   }
 }
+}
+*/
