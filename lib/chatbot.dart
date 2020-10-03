@@ -172,7 +172,7 @@ class ChatMessage extends StatelessWidget {
             Container(
               margin: const EdgeInsets.only(right: 16.0),
               // 사용자명의 첫번째 글자를 서클 아바타로 표시
-              child: CircleAvatar(child: Text(header.userName[0])),
+              child: CircleAvatar(child: Text(header.userName[0]) ?? 'Unknown'),
             ),
             Expanded(
               // 컬럼 추가

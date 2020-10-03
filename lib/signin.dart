@@ -1,3 +1,5 @@
+import 'package:flutter/services.dart';
+
 import 'header.dart';
 import 'package:flutter/material.dart';
 
@@ -228,6 +230,9 @@ class _SignInState extends State<SignIn> {
                 ),
                 TextFormField(
                     // id 입력
+                    inputFormatters: [
+                      FilteringTextInputFormatter(RegExp('[a-z]'), allow: true),
+                    ],
                     controller: idController,
                     keyboardType: TextInputType.emailAddress,
                     maxLength: 10,
@@ -290,6 +295,7 @@ class _SignInState extends State<SignIn> {
                 ),
                 TextFormField(
                     // 핸드폰 번호 입력
+                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                     controller: phoneController,
                     keyboardType: TextInputType.number,
                     maxLength: 10,
@@ -305,6 +311,7 @@ class _SignInState extends State<SignIn> {
                 ),
                 TextFormField(
                     // 군번 입력
+                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                     controller: armyNumController,
                     keyboardType: TextInputType.text,
                     decoration: InputDecoration(

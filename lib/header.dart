@@ -24,3 +24,10 @@ bool isDarkMode = true;
 String userName = "이름";
 String userEmail = "";
 String userArmyNum = "";
+
+/*
+
+inputFormatters: [ FilteringTextInputFormatter(RegExp('[a-z]'), allow: true),], // 문자만 허용
+inputFormatters: [FilteringTextInputFormatter.digitsOnly], // 숫자만 허용
+
+*/

@@ -1,3 +1,5 @@
+import 'package:flutter/services.dart';
+
 import 'header.dart' as header;
 import 'package:army_chatbot/signin.dart';
 import 'package:army_chatbot/user.dart';
@@ -71,11 +73,11 @@ class _MyHomePageState extends State<MyHomePage> {
       if (idController.text == "admin" && passwdController.text == "admin") {
         Navigator.push(
             context, MaterialPageRoute(builder: (context) => UserInfo()));
+      } else if (idController.text == "" || passwdController.text == "") {
+        _alert();
+        return;
       } else {
         _alert("아이디 혹은 비밀번호가 올바르지 않습니다.");
-      }
-      if (idController.text == "" || passwdController.text == "") {
-        _alert();
         return;
       }
 
@@ -125,6 +127,9 @@ class _MyHomePageState extends State<MyHomePage> {
                   child: Text('육군 규정 상담 챗봇, "아미챗봇" '),
                 ),
                 TextFormField(
+                    inputFormatters: [
+                      FilteringTextInputFormatter(RegExp('[a-z]'), allow: true),
+                    ], // 문자만 허용
                     controller: idController,
                     keyboardType: TextInputType.emailAddress,
                     decoration: InputDecoration(
