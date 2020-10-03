@@ -1,7 +1,8 @@
-import 'package:army_chatbot/counselor.dart';
+import 'header.dart' as header;
 import 'package:army_chatbot/signin.dart';
 import 'package:army_chatbot/user.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 
 void main() {
   runApp(MyApp());
@@ -13,22 +14,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Army ChatBot',
-      theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // Try running your application with "flutter run". You'll see the
-        // application has a blue toolbar. Then, without quitting the app, try
-        // changing the primarySwatch below to Colors.green and then invoke
-        // "hot reload" (press "r" in the console where you ran "flutter run",
-        // or simply save your changes to "hot reload" in a Flutter IDE).
-        // Notice that the counter didn't reset back to zero; the application
-        // is not restarted.
-        primarySwatch: Colors.blue,
-        // This makes the visual density adapt to the platform that you run
-        // the app on. For desktop platforms, the controls will be smaller and
-        // closer together (more dense) than on mobile platforms.
-        visualDensity: VisualDensity.adaptivePlatformDensity,
-      ),
+      theme: header.isDarkMode ? header.darkModeTheme : header.defaultTheme,
       home: MyHomePage(title: 'Army ChatBot'),
     );
   }
@@ -59,14 +45,14 @@ class _MyHomePageState extends State<MyHomePage> {
   String id = '아직 아이디가 입력되지 않았습니다.';
   String passwd = '아직 비밀번호가 입력되지 않았습니다.';
 
-  void _alert() {
+  void _alert([String text]) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         // return object of type Dialog
         return AlertDialog(
           title: new Text("입력"),
-          content: new Text("아이디 혹은 비밀번호를 입력해주세요"),
+          content: new Text(text ?? "아이디 혹은 비밀번호를 입력해주세요"),
           actions: <Widget>[
             new FlatButton(
               child: new Text("닫기"),
@@ -86,8 +72,7 @@ class _MyHomePageState extends State<MyHomePage> {
         Navigator.push(
             context, MaterialPageRoute(builder: (context) => UserInfo()));
       } else {
-        Navigator.push(
-            context, MaterialPageRoute(builder: (context) => CounSel()));
+        _alert("아이디 혹은 비밀번호가 올바르지 않습니다.");
       }
       if (idController.text == "" || passwdController.text == "") {
         _alert();

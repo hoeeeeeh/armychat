@@ -30,6 +30,7 @@ class _CounSelState extends State<CounSel> {
   String contents = "상담 내용을 입력해주세요.";
 
   bool checked = false; // 상담 신청 동의 체크
+  bool anonyCheck = false;
 
   void _alert(String output) {
     showDialog(
@@ -70,6 +71,12 @@ class _CounSelState extends State<CounSel> {
   void _isChecked(bool value) {
     setState(() {
       checked = !checked;
+    });
+  }
+
+  void SetAnonymous(bool value) {
+    setState(() {
+      anonyCheck = !anonyCheck;
     });
   }
 
@@ -155,54 +162,39 @@ class _CounSelState extends State<CounSel> {
                   padding: EdgeInsets.all(10),
                 ),
                 TextFormField(
-                    // id 입력
-                    controller: idController,
-                    keyboardType: TextInputType.emailAddress,
-                    maxLength: 10,
-                    decoration: InputDecoration(
-                        hintText: '아이디를 입력해주세요',
-                        suffixIcon: IconButton(
-                          onPressed: () => idController.clear(),
-                          icon: Icon(Icons.clear),
-                        ),
-                        border: OutlineInputBorder())),
-                Padding(
-                  padding: EdgeInsets.all(1),
-                ),
-                TextFormField(
-                    // passwd 입력
-                    controller: passwdController,
-                    maxLines: 1,
-                    maxLength: 15,
-                    keyboardType: TextInputType.visiblePassword,
-                    obscureText: true,
-                    decoration: InputDecoration(
-                        hintText: '비밀번호를 입력해주세요',
-                        suffixIcon: IconButton(
-                          onPressed: () => passwdController.clear(),
-                          icon: Icon(Icons.clear),
-                        ),
-                        border: OutlineInputBorder())),
-                Padding(
-                  padding: EdgeInsets.all(1),
-                ),
-                TextFormField(
                     // 이메일주소 입력
                     controller: emailController,
                     maxLength: 30,
                     keyboardType: TextInputType.emailAddress,
                     decoration: InputDecoration(
-                        hintText: '이메일을 입력해주세요',
+                        hintText: '답변을 받을 이메일을 입력해주세요',
                         suffixIcon: IconButton(
                           onPressed: () => emailController.clear(),
                           icon: Icon(Icons.clear),
                         ),
                         border: OutlineInputBorder())),
                 Padding(
-                  padding: EdgeInsets.all(1),
+                  padding: EdgeInsets.all(3),
                 ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text('익명으로 상담하기'),
+                    Center(
+                        child: Checkbox(
+                      onChanged: SetAnonymous,
+                      value: anonyCheck,
+                    )),
+                  ],
+                ),
+
+                Padding(
+                  padding: EdgeInsets.all(10),
+                ),
+
                 TextFormField(
                     // 이름
+                    enabled: !anonyCheck,
                     maxLength: 10,
                     controller: nameController,
                     keyboardType: TextInputType.name,
@@ -218,6 +210,7 @@ class _CounSelState extends State<CounSel> {
                 ),
                 TextFormField(
                     // 핸드폰 번호 입력
+                    enabled: !anonyCheck,
                     controller: phoneController,
                     keyboardType: TextInputType.number,
                     maxLength: 10,
@@ -233,6 +226,7 @@ class _CounSelState extends State<CounSel> {
                 ),
                 TextFormField(
                     // 군번 입력
+                    enabled: !anonyCheck,
                     controller: armyNumController,
                     keyboardType: TextInputType.text,
                     decoration: InputDecoration(
@@ -242,8 +236,23 @@ class _CounSelState extends State<CounSel> {
                           icon: Icon(Icons.clear),
                         ),
                         border: OutlineInputBorder())),
+                Padding(
+                  padding: EdgeInsets.only(bottom: 10),
+                ),
+                Text(
+                  '익명으로 상담해도 로그 기록은 남으니,\n상담관님께 폭언,욕설은 자제해주시길 바랍니다.',
+                  textAlign: TextAlign.center,
+                ),
+                Padding(
+                  padding: EdgeInsets.only(bottom: 10),
+                ),
 
-                Text('Good Luck'),
+                Center(
+                  child: RaisedButton(
+                      child: Text("접수하기"),
+                      onPressed: () => _alert("상담이 접수되었습니다.")),
+                ),
+
                 //Text('Your PW: $passwd'),
               ],
             ),
