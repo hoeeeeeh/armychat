@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'setting.dart' as setting;
 import 'counselor.dart' as counselor;
 import 'chatbot.dart' as bot;
+import 'home.dart' as home;
 
 class UserInfo extends StatefulWidget {
   UserInfo({Key key, this.title}) : super(key: key);
@@ -15,7 +16,7 @@ class _UserInfoState extends State<UserInfo> {
   int _selectedIndex = 0;
 
   final List<Widget> _widgetArray = <Widget>[
-    bot.ChatScreen(),
+    home.Homepage(),
     counselor.CounSel(),
     setting.Setting(),
   ];
@@ -40,16 +41,16 @@ class _UserInfoState extends State<UserInfo> {
       bottomNavigationBar: BottomNavigationBar(
         items: <BottomNavigationBarItem>[
           BottomNavigationBarItem(
-            icon: Icon(Icons.chat),
-            title: Text('챗봇 상담'),
+            icon: Icon(Icons.home),
+            label: '홈',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.chat_bubble),
-            title: Text('상담관님께 상담'),
+            label: '상담하기',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.settings),
-            title: Text('설정'),
+            label: '설정',
           ),
         ],
         currentIndex: _selectedIndex,

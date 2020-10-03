@@ -114,10 +114,11 @@ class MakingNotes extends StatefulWidget {
 
 class _MakingNotesState extends State<MakingNotes> {
   @override
+  int count = 0;
   Timer _timer;
-  Timer _timer2;
+
   bool _visible = true;
-  String text = '개발자 : 병장 유XX, 일병 김XX \n 기획 : 일병 나XX';
+  String text = '개발자 : 병장 유호균, 일병 김영길 \n 기획 : 일병 나건우';
 
   @override
   void initState() {
@@ -126,19 +127,28 @@ class _MakingNotesState extends State<MakingNotes> {
     _start();
   }
 
-  void _start() {
-    _timer = Timer.periodic(Duration(seconds: 5), (timer) {
-      setState(() {
-        _visible = false;
-        _timer.cancel();
-      });
-    });
+  void dispose() {
+    super.dispose();
+    _timer.cancel();
+  }
 
-    _timer2 = Timer.periodic(Duration(seconds: 10), (timer) {
+  void _start() {
+    _timer = Timer.periodic(Duration(seconds: 7), (timer) {
       setState(() {
-        text = 'Thanks To 박XX';
-        _timer2.cancel();
-        _visible = true;
+        if (count == 0) {
+          _visible = false;
+          count++;
+        } else if (count == 1) {
+          text =
+              '소프트웨어 동아리를 위해 아낌없이 힘 써주신 \n 박필하 대대장님 && 한갑교 중사님, 진심으로 감사드립니다.';
+          _visible = true;
+          count++;
+        } else if (count == 2) {
+          _visible = false;
+          count++;
+        } else if (count == 3) {
+          Navigator.pop(context);
+        }
       });
     });
   }
@@ -152,7 +162,21 @@ class _MakingNotesState extends State<MakingNotes> {
           opacity: _visible ? 1.0 : 0.0,
           duration: Duration(milliseconds: 500),
           // The green box must be a child of the AnimatedOpacity widget.
-          child: Container(child: Center(child: Text(text ?? 'default value'))),
+          child: Container(
+              child: Center(
+                  child: Text(
+            text ?? 'default value',
+            textAlign: TextAlign.center,
+          ))),
         ));
   }
 }
+
+//   _timer2 = Timer.periodic(Duration(seconds: 10), (timer) {
+//     setState(() {
+//       text = 'Thanks To 박XX';
+//       _timer2.cancel();
+//       _visible = true;
+//     });
+//   });
+// }
