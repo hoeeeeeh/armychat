@@ -3,6 +3,10 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/cupertino.dart';
 import 'header.dart' as header;
 
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'package:bubble/bubble.dart'; // chatbot 테스트 위해 추가
+
 class ChatScreen extends StatefulWidget {
   ChatScreenState createState() => ChatScreenState();
 }
@@ -11,6 +15,12 @@ class ChatScreen extends StatefulWidget {
 class ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
   // 입력한 메시지를 저장하는 리스트
   final List<ChatMessage> _message = <ChatMessage>[];
+
+  //사용자별 고유 ID 생성
+  final GlobalKey<AnimatedListState> _listKey = GlobalKey();
+
+  // 서버
+  static const String SRV_URL = "https://www.naver.cqweqwe";
 
   // 텍스트필드 제어용 컨트롤러
   final TextEditingController _textController = TextEditingController();
@@ -111,6 +121,52 @@ class ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
     );
   }
 
+  http.Client _getClient() {
+    return http.Client();
+  }
+
+  void _getResponse() {
+    if (_textController.text.length > 0) {
+      //this._insertSingleItem(_textController.text);
+      var client = _getClient();
+      try {
+        client.post(
+          SRV_URL,
+          body: {"query": _textController.text},
+        )..then((response) {
+            Map<String, dynamic> data = jsonDecode(response.body);
+            _insertSingleItem(data['response'] + "<bot>");
+          });
+      } catch (e) {
+        print("Failed -> $e");
+      } finally {
+        client.close();
+        _textController.clear();
+      }
+    }
+  }
+
+  void _insertSingleItem(ChatMessage message) {
+    _message.add(message);
+    _listKey.currentState.insertItem(_message.length - 1);
+  }
+
+  Widget _buildItem(String item, Animation animation, int index) {
+    bool mine = item.endsWith("<bot>");
+    return SizeTransition(
+        sizeFactor: animation,
+        child: Padding(
+          padding: EdgeInsets.only(top: 10),
+          child: Container(
+              alignment: mine ? Alignment.topLeft : Alignment.topRight,
+              child: Bubble(
+                child: Text(item.replaceAll("<bot>", "")),
+                color: mine ? Colors.blue : Colors.indigo,
+                padding: BubbleEdges.all(10),
+              )),
+        ));
+  }
+
   // 메시지 전송 버튼이 클릭될 때 호출
   void _handleSubmitted(String text) {
     // 텍스트 필드의 내용 삭제
@@ -172,7 +228,7 @@ class ChatMessage extends StatelessWidget {
             Container(
               margin: const EdgeInsets.only(right: 16.0),
               // 사용자명의 첫번째 글자를 서클 아바타로 표시
-              child: CircleAvatar(child: Text(header.userName[0]) ?? 'Unknown'),
+              child: CircleAvatar(child: Text(header.userName[0])),
             ),
             Expanded(
               // 컬럼 추가
