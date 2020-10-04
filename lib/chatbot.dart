@@ -20,7 +20,7 @@ class ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
   final GlobalKey<AnimatedListState> _listKey = GlobalKey();
 
   // 서버
-  static const String SRV_URL = "http://dc5b82ffa192.ngrok.io";
+  static const String SRV_URL = "http://e936f99e61eb.ngrok.io";
 
   //텍스트필드 제어용 컨트롤러
   TextEditingController _queryController = TextEditingController();
@@ -86,8 +86,9 @@ class ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
           SRV_URL,
           body: {"query": _queryController.text},
         )..then((response) {
+            print(response.body);
             Map<String, dynamic> data = jsonDecode(response.body);
-            _insertSingleItem(data['response'] + "<bot>");
+            _insertSingleItem(ChatMessage(text: data['response'] + "<bot>"));
           });
       } catch (e) {
         print("Failed -> $e");
@@ -99,6 +100,7 @@ class ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
   }
 
   void _insertSingleItem(ChatMessage message) {
+    //String contents = message.text;
     _message.add(message);
     _listKey.currentState.insertItem(_message.length - 1);
   }

@@ -19,6 +19,7 @@ class _UserInfoState extends State<UserInfo> {
     home.Homepage(),
     counselor.CounSel(),
     setting.Setting(),
+    bot.ChatScreen(),
   ];
 
   void _onItemTapped(int index) {
@@ -46,7 +47,11 @@ class _UserInfoState extends State<UserInfo> {
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.chat_bubble),
-            label: '상담하기',
+            label: '상담관과 상담하기',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.chat_sharp),
+            label: '챗봇과 상담하기',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.settings),
