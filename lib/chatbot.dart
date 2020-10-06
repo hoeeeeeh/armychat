@@ -155,7 +155,7 @@ class ChatMessage extends StatelessWidget {
                 children: <Widget>[
                   // 사용자명을 subhead 테마로 출력
                   Text(header.userName,
-                      style: Theme.of(context).textTheme.subhead),
+                      style: Theme.of(context).textTheme.subtitle1),
                   // 입력받은 메시지 출력
                   Container(
                     margin: const EdgeInsets.only(top: 5.0),
