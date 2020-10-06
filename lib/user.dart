@@ -5,22 +5,38 @@ import 'chatbot.dart' as bot;
 import 'home.dart' as home;
 
 class Userinfo extends StatefulWidget {
-  Userinfo({Key key, this.title}) : super(key: key);
-  final String title;
+  // Userinfo({Key key, this.title}) : super(key: key);
+  // final String title;
+  final String userName;
+  final String email;
+
+  Userinfo(this.userName, this.email) {
+    print(userName + email);
+  }
+
+  Userinfo.nonFastLogin(this.userName, this.email) {
+    print(userName + email);
+  }
 
   @override
-  _UserinfoState createState() => _UserinfoState();
+  _UserinfoState createState() => _UserinfoState(userName, email);
 }
 
 class _UserinfoState extends State<Userinfo> {
   int _selectedIndex = 0;
 
-  final List<Widget> _widgetArray = <Widget>[
-    home.Homepage(),
-    counselor.CounSel(),
-    setting.Setting(),
-    bot.ChatScreen(),
-  ];
+  final String userName;
+  final String email;
+  List<Widget> _widgetArray;
+
+  _UserinfoState(this.userName, this.email) {
+    _widgetArray = <Widget>[
+      home.Homepage(userName, email),
+      counselor.CounSel(),
+      setting.Setting(),
+      bot.ChatScreen()
+    ];
+  }
 
   void _onItemTapped(int index) {
     setState(() {

@@ -83,11 +83,19 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  void _login() {
+  void _login([String name, String email]) {
+    if (name != null && email != null) {
+      Navigator.push(context,
+          MaterialPageRoute(builder: (context) => Userinfo(name, email)));
+      return;
+    }
     setState(() {
       if (idController.text == "admin" && passwdController.text == "admin") {
         Navigator.push(
-            context, MaterialPageRoute(builder: (context) => Userinfo()));
+            context,
+            MaterialPageRoute(
+                builder: (context) =>
+                    Userinfo('DB에서 받아올 이름', 'backgol@naver.com')));
       } else if (idController.text == "" || passwdController.text == "") {
         _alert();
         return;
@@ -199,6 +207,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       SignInButton(Buttons.Google, onPressed: () {
                         _handleSignIn().then((user) {
                           print(user);
+                          _login(user.displayName, user.email);
                         });
                       }),
                       SignInButton(Buttons.Facebook, onPressed: () {}),

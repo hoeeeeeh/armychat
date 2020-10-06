@@ -3,16 +3,23 @@ import 'package:table_calendar/table_calendar.dart';
 import 'package:flutter/material.dart';
 
 class Homepage extends StatefulWidget {
-  Homepage({Key key, this.title}) : super(key: key);
-  final String title;
+  final String userName;
+  final String email;
+  Homepage(this.userName, this.email);
 
   @override
-  _HomepageState createState() => _HomepageState();
+  _HomepageState createState() => _HomepageState(userName, email);
 }
 
 class _HomepageState extends State<Homepage> {
   @override
   var _calendarController;
+
+  final String userName;
+  final String email;
+
+  _HomepageState(this.userName, this.email);
+
   void initState() {
     super.initState();
     _calendarController = CalendarController();
@@ -33,6 +40,11 @@ class _HomepageState extends State<Homepage> {
       body: SingleChildScrollView(
           child: Column(
         children: [
+          Padding(
+            padding: EdgeInsets.only(bottom: 20),
+          ),
+          Text(userName + '님(' + email + ') 어서오세요.'),
+          Padding(padding: EdgeInsets.only(bottom: 20)),
           Container(
             padding: EdgeInsets.only(top: 20.0),
             child: Text('내 상담 확인하기'),
