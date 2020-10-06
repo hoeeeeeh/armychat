@@ -4,15 +4,15 @@ import 'counselor.dart' as counselor;
 import 'chatbot.dart' as bot;
 import 'home.dart' as home;
 
-class UserInfo extends StatefulWidget {
-  UserInfo({Key key, this.title}) : super(key: key);
+class Userinfo extends StatefulWidget {
+  Userinfo({Key key, this.title}) : super(key: key);
   final String title;
 
   @override
-  _UserInfoState createState() => _UserInfoState();
+  _UserinfoState createState() => _UserinfoState();
 }
 
-class _UserInfoState extends State<UserInfo> {
+class _UserinfoState extends State<Userinfo> {
   int _selectedIndex = 0;
 
   final List<Widget> _widgetArray = <Widget>[

@@ -1,10 +1,13 @@
 import 'package:flutter/services.dart';
-
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_signin_button/flutter_signin_button.dart';
 import 'header.dart' as header;
 import 'package:army_chatbot/signin.dart';
 import 'package:army_chatbot/user.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
+import 'package:firebase_core/firebase_core.dart';
 
 void main() {
   runApp(MyApp());
@@ -17,7 +20,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Army ChatBot',
       theme: header.isDarkMode ? header.darkModeTheme : header.defaultTheme,
-      home: MyHomePage(title: 'Army ChatBot'),
+      home: FirebaseInit(),
     );
   }
 }
@@ -47,11 +50,23 @@ class _MyHomePageState extends State<MyHomePage> {
   String id = '아직 아이디가 입력되지 않았습니다.';
   String passwd = '아직 비밀번호가 입력되지 않았습니다.';
 
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+  }
+
   void _alert([String text]) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        // return object of type Dialog
+        // return object of type Dialogs
         return AlertDialog(
           title: new Text("입력"),
           content: new Text(text ?? "아이디 혹은 비밀번호를 입력해주세요"),
@@ -72,7 +87,7 @@ class _MyHomePageState extends State<MyHomePage> {
     setState(() {
       if (idController.text == "admin" && passwdController.text == "admin") {
         Navigator.push(
-            context, MaterialPageRoute(builder: (context) => UserInfo()));
+            context, MaterialPageRoute(builder: (context) => Userinfo()));
       } else if (idController.text == "" || passwdController.text == "") {
         _alert();
         return;
@@ -85,6 +100,9 @@ class _MyHomePageState extends State<MyHomePage> {
       passwd = passwdController.text;
     });
   }
+
+  final GoogleSignIn _googleSignIn = GoogleSignIn();
+  final FirebaseAuth _auth = FirebaseAuth.instance;
 
   @override
   Widget build(BuildContext context) {
@@ -172,8 +190,22 @@ class _MyHomePageState extends State<MyHomePage> {
                                 context,
                                 MaterialPageRoute(
                                     builder: (context) => SignIn()));
-                          })
+                          }),
                     ])),
+                Padding(padding: EdgeInsets.only(bottom: 10)),
+                Center(
+                  child: Column(
+                    children: [
+                      SignInButton(Buttons.Google, onPressed: () {
+                        _handleSignIn().then((user) {
+                          print(user);
+                        });
+                      }),
+                      SignInButton(Buttons.Facebook, onPressed: () {}),
+                      SignInButton(Buttons.Apple, onPressed: () {}),
+                    ],
+                  ),
+                )
                 //Text('Your ID: $id'),
                 //Text('Your PW: $passwd'),
               ],
@@ -182,5 +214,39 @@ class _MyHomePageState extends State<MyHomePage> {
         )
         // This trailing comma makes auto-formatting nicer for build methods.
         );
+  }
+
+  Future<User> _handleSignIn() async {
+    GoogleSignInAccount googleUser = await _googleSignIn.signIn();
+    GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+    User user = (await _auth.signInWithCredential(GoogleAuthProvider.credential(
+            idToken: googleAuth.idToken, accessToken: googleAuth.accessToken)))
+        .user;
+    print("signed in " + user.displayName);
+    return user;
+  }
+}
+
+class FirebaseInit extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder(
+      // Initialize FlutterFire
+      future: Firebase.initializeApp(),
+      builder: (context, snapshot) {
+        // Check for errors
+        if (snapshot.hasError) {
+          return Text('what the fuck');
+        }
+
+        // Once complete, show your application
+        if (snapshot.connectionState == ConnectionState.done) {
+          return MyHomePage(title: 'Army ChatBot');
+        }
+
+        // Otherwise, show something whilst waiting for initialization to complete
+        return Text("it's too hard");
+      },
+    );
   }
 }
