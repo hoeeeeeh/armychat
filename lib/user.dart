@@ -33,8 +33,8 @@ class _UserinfoState extends State<Userinfo> {
     _widgetArray = <Widget>[
       home.Homepage(userName, email),
       counselor.CounSel(),
-      setting.Setting(),
-      bot.ChatScreen()
+      bot.ChatScreen(),
+      setting.Setting()
     ];
   }
 
