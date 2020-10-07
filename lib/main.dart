@@ -50,6 +50,16 @@ class _MyHomePageState extends State<MyHomePage> {
   String id = '아직 아이디가 입력되지 않았습니다.';
   String passwd = '아직 비밀번호가 입력되지 않았습니다.';
 
+  Future<User> _handleSignIn() async {
+    GoogleSignInAccount googleUser = await _googleSignIn.signIn();
+    GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+    User user = (await _auth.signInWithCredential(GoogleAuthProvider.credential(
+            idToken: googleAuth.idToken, accessToken: googleAuth.accessToken)))
+        .user;
+    print("signed in " + user.displayName);
+    return user;
+  }
+
   @override
   void initState() {
     // TODO: implement initState
@@ -60,6 +70,8 @@ class _MyHomePageState extends State<MyHomePage> {
   void dispose() {
     // TODO: implement dispose
     super.dispose();
+    idController.dispose();
+    passwdController.dispose();
   }
 
   void _alert([String text]) {
@@ -223,16 +235,6 @@ class _MyHomePageState extends State<MyHomePage> {
         )
         // This trailing comma makes auto-formatting nicer for build methods.
         );
-  }
-
-  Future<User> _handleSignIn() async {
-    GoogleSignInAccount googleUser = await _googleSignIn.signIn();
-    GoogleSignInAuthentication googleAuth = await googleUser.authentication;
-    User user = (await _auth.signInWithCredential(GoogleAuthProvider.credential(
-            idToken: googleAuth.idToken, accessToken: googleAuth.accessToken)))
-        .user;
-    print("signed in " + user.displayName);
-    return user;
   }
 }
 
