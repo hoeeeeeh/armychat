@@ -20,7 +20,7 @@ class ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
   final GlobalKey<AnimatedListState> _listKey = GlobalKey();
 
   // 서버
-  static const String SRV_URL = "http://e936f99e61eb.ngrok.io";
+  static const String SRV_URL = "https://e936f99e61eb.ngrok.io";
 
   //텍스트필드 제어용 컨트롤러
   TextEditingController _queryController = TextEditingController();
