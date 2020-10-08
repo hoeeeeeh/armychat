@@ -34,7 +34,7 @@ class _UserinfoState extends State<Userinfo> {
       home.Homepage(userName, email),
       counselor.CounSel(),
       bot.ChatScreen(),
-      setting.Setting()
+      setting.Setting(),
     ];
   }
 

@@ -8,6 +8,8 @@ import 'package:army_chatbot/user.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:loading_animations/loading_animations.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 void main() {
   runApp(MyApp());
@@ -58,6 +60,13 @@ class _MyHomePageState extends State<MyHomePage> {
         .user;
     print("signed in " + user.displayName);
     return user;
+  }
+
+  final GoogleSignIn _googleSignIn = GoogleSignIn();
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+
+  _signOut() async {
+    await _auth.signOut();
   }
 
   @override
@@ -121,9 +130,6 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
-  final GoogleSignIn _googleSignIn = GoogleSignIn();
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-
   @override
   Widget build(BuildContext context) {
     // This method is rerun every time setState is called, for instance as done
@@ -133,6 +139,7 @@ class _MyHomePageState extends State<MyHomePage> {
     // fast, so that you can just rebuild anything that needs updating rather
     // than having to individually change instances of widgets.
     return Scaffold(
+        resizeToAvoidBottomPadding: false,
         appBar: AppBar(
           // Here we take the value from the MyHomePage object that was created by
           // the App.build method, and use it to set our appbar title.
@@ -222,7 +229,9 @@ class _MyHomePageState extends State<MyHomePage> {
                           _login(user.displayName, user.email);
                         });
                       }),
-                      SignInButton(Buttons.Facebook, onPressed: () {}),
+                      SignInButton(Buttons.Facebook, onPressed: () {
+                        _signOut();
+                      }),
                       SignInButton(Buttons.Apple, onPressed: () {}),
                     ],
                   ),
@@ -256,7 +265,7 @@ class FirebaseInit extends StatelessWidget {
         }
 
         // Otherwise, show something whilst waiting for initialization to complete
-        return Text("it's too hard");
+        return LoadingFlipping.circle();
       },
     );
   }
