@@ -58,24 +58,28 @@ class _UserinfoState extends State<Userinfo> {
       bottomNavigationBar: BottomNavigationBar(
         items: <BottomNavigationBarItem>[
           BottomNavigationBarItem(
+            backgroundColor: Colors.green,
             icon: Icon(Icons.home),
             label: '홈',
           ),
           BottomNavigationBarItem(
+            backgroundColor: Colors.red,
             icon: Icon(Icons.chat_bubble),
             label: '상담관과 상담하기',
           ),
           BottomNavigationBarItem(
+            backgroundColor: Colors.blue,
             icon: Icon(Icons.chat_sharp),
             label: '챗봇과 상담하기',
           ),
           BottomNavigationBarItem(
+            backgroundColor: Colors.grey,
             icon: Icon(Icons.settings),
             label: '설정',
           ),
         ],
         currentIndex: _selectedIndex,
-        selectedItemColor: Colors.amber[800],
+        selectedItemColor: Colors.amber[400],
         onTap: _onItemTapped,
       ),
     );

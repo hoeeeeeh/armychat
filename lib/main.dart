@@ -1,3 +1,4 @@
+//import 'dart:html';
 import 'package:flutter/services.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -64,6 +65,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   final GoogleSignIn _googleSignIn = GoogleSignIn();
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseFirestore firestore = FirebaseFirestore.instance;
 
   _signOut() async {
     await _auth.signOut();
@@ -81,6 +83,20 @@ class _MyHomePageState extends State<MyHomePage> {
     super.dispose();
     idController.dispose();
     passwdController.dispose();
+  }
+
+  Widget makeText(String title, {double width, double height}) {
+    return Container(
+      child: Center(
+        child: Text(
+          title,
+          style: TextStyle(fontSize: 23.0),
+        ),
+      ),
+      width: width,
+      height: height,
+      decoration: BoxDecoration(color: Colors.red[300]),
+    );
   }
 
   void _alert([String text]) {
@@ -104,13 +120,22 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  void _login([String name, String email]) {
-    if (name != null && email != null) {
+  void _login([String id, String email]) {
+    if (id != null && email != null) {
       Navigator.push(context,
-          MaterialPageRoute(builder: (context) => Userinfo(name, email)));
+          MaterialPageRoute(builder: (context) => Userinfo(id, email)));
       return;
     }
+
     setState(() {
+      // final snapShot = firestore.collection("member").doc(id).get().then((doc) {
+      //   if (doc.exists){
+
+      //   }
+      //   else{
+      //     _alert('아이디 혹은 비밀번호를 확인해주세요');
+      //   }
+      // });;
       if (idController.text == "admin" && passwdController.text == "admin") {
         Navigator.push(
             context,
@@ -219,7 +244,59 @@ class _MyHomePageState extends State<MyHomePage> {
                                     builder: (context) => SignIn()));
                           }),
                     ])),
-                Padding(padding: EdgeInsets.only(bottom: 10)),
+                Padding(padding: EdgeInsets.only(bottom: 20)),
+
+                Container(
+                  height: 30,
+                  //color: Colors.black,
+                  child: Stack(
+                    children: [
+                      Positioned(
+                        top: 15,
+                        left: 0,
+                        right: 230,
+                        child: Container(
+                          margin: EdgeInsets.only(bottom: 20.0),
+                          alignment: Alignment.topCenter,
+                          height: 1.0,
+                          decoration: BoxDecoration(
+                              border: Border(
+                                  bottom: BorderSide(
+                                      color: Colors.black, width: 1))),
+                        ),
+                      ),
+                      Positioned(
+                          top: 0,
+                          bottom: 1,
+                          left: 140,
+                          right: 140,
+                          child: Container(
+                            child: Text(
+                              '또는',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                  fontSize: 25, fontFamily: 'GamjaFlower'),
+                            ),
+                          )),
+                      Positioned(
+                        top: 15,
+                        left: 230,
+                        right: 0,
+                        child: Container(
+                          margin: EdgeInsets.only(bottom: 20.0),
+                          alignment: Alignment.topCenter,
+                          height: 1.0,
+                          decoration: BoxDecoration(
+                              border: Border(
+                                  bottom: BorderSide(
+                                      color: Colors.black, width: 1))),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                Padding(padding: EdgeInsets.only(bottom: 20)),
                 Center(
                   child: Column(
                     children: [
@@ -232,7 +309,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       SignInButton(Buttons.Facebook, onPressed: () {
                         _signOut();
                       }),
-                      SignInButton(Buttons.Apple, onPressed: () {}),
+                      // SignInButton(Buttons.Apple, onPressed: () {}),
                     ],
                   ),
                 )

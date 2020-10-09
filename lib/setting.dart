@@ -52,11 +52,14 @@ class _SettingState extends State<Setting> {
                   onTap: () => Navigator.push(context,
                       MaterialPageRoute(builder: (context) => MakingNotes())),
                   leading: Icon(Icons.people)),
+              // ListTile(
+              //   title: Text('설정 1'),
+              // ),
               ListTile(
-                title: Text('설정 1'),
-              ),
-              ListTile(
-                title: Text('설정 2'),
+                title: Text(
+                  '앱에 관련된 문의사항은 \n hoeeeeeh@gmail.com으로 문의주세요!!',
+                  textAlign: TextAlign.center,
+                ),
               ),
             ],
           ).toList(),
