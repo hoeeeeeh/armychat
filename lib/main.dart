@@ -120,39 +120,52 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  void _login([String id, String email]) {
-    if (id != null && email != null) {
-      Navigator.push(context,
-          MaterialPageRoute(builder: (context) => Userinfo(id, email)));
+  void _login([String id, String pw]) {
+    /*
+    if (id != null && pw != null) {
+      Navigator.push(
+          context, MaterialPageRoute(builder: (context) => Userinfo(id, pw)));
+      return;
+    }
+    */
+
+    Future<void> firebaseIDconfirm() async {
+      print(id);
+      print(pw);
+
+      final snapShot = await firestore.collection("member").doc(id).get();
+      if (snapShot.exists) {
+        var user = snapShot.data();
+        if (user['passwd'] == pw) {
+          print('ggg');
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => Userinfo(user['name'], user['email'])));
+        }
+      } else {
+        _alert('아이디 혹은 비밀번호를 확인해주십시오.');
+      }
+    }
+
+    firebaseIDconfirm();
+    return;
+    if (idController.text == "admin" && passwdController.text == "admin") {
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) =>
+                  Userinfo('DB에서 받아올 이름', 'backgol@naver.com')));
+    } else if (idController.text == "" || passwdController.text == "") {
+      _alert();
+      return;
+    } else {
+      _alert("아이디 혹은 비밀번호가 올바르지 않습니다.");
       return;
     }
 
-    setState(() {
-      // final snapShot = firestore.collection("member").doc(id).get().then((doc) {
-      //   if (doc.exists){
-
-      //   }
-      //   else{
-      //     _alert('아이디 혹은 비밀번호를 확인해주세요');
-      //   }
-      // });;
-      if (idController.text == "admin" && passwdController.text == "admin") {
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) =>
-                    Userinfo('DB에서 받아올 이름', 'backgol@naver.com')));
-      } else if (idController.text == "" || passwdController.text == "") {
-        _alert();
-        return;
-      } else {
-        _alert("아이디 혹은 비밀번호가 올바르지 않습니다.");
-        return;
-      }
-
-      id = idController.text;
-      passwd = passwdController.text;
-    });
+    id = idController.text;
+    passwd = passwdController.text;
   }
 
   @override
@@ -198,7 +211,8 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
                 TextFormField(
                     inputFormatters: [
-                      FilteringTextInputFormatter(RegExp('[a-z]'), allow: true),
+                      FilteringTextInputFormatter(RegExp('[a-z,0-9]'),
+                          allow: true),
                     ], // 문자만 허용
                     controller: idController,
                     keyboardType: TextInputType.emailAddress,
@@ -230,7 +244,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       RaisedButton(
                           child: Text('로그인'),
                           onPressed: () {
-                            _login();
+                            _login(idController.text, passwdController.text);
                           }),
                       Padding(
                         padding: EdgeInsets.only(left: 10),

@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/services.dart';
 
 import 'header.dart';
@@ -28,6 +29,7 @@ class _SignInState extends State<SignIn> {
   TextEditingController nameController;
   TextEditingController phoneController;
   TextEditingController armyNumController;
+  final FirebaseFirestore firestore = FirebaseFirestore.instance;
 
   String id;
   String passwd;
@@ -138,6 +140,14 @@ class _SignInState extends State<SignIn> {
       output = output + '\n은 필수 기재 항목입니다.';
       _alert(output);
     } else {
+      firestore.collection('member').doc(idController.text).set({
+        'id': idController.text,
+        'passwd': passwdController.text,
+        'email': emailController.text,
+        'armyNum': armyNumController.text,
+        'phoneNum': phoneController.text,
+        'name': nameController.text,
+      });
       Navigator.pop(context);
       //idController.text = ; 나중에 회원가입하면 자동으로 로그인 창에 아이디,비번 띄워주는 옵션
       _alert('정상적으로 회원가입이 되었습니다.');
@@ -231,11 +241,12 @@ class _SignInState extends State<SignIn> {
                 TextFormField(
                     // id 입력
                     inputFormatters: [
-                      FilteringTextInputFormatter(RegExp('[a-z]'), allow: true),
+                      FilteringTextInputFormatter(RegExp('[a-z,0-9]'),
+                          allow: true),
                     ],
                     controller: idController,
                     keyboardType: TextInputType.emailAddress,
-                    maxLength: 10,
+                    maxLength: 15,
                     decoration: InputDecoration(
                         hintText: '아이디를 입력해주세요',
                         suffixIcon: IconButton(
@@ -248,6 +259,10 @@ class _SignInState extends State<SignIn> {
                 ),
                 TextFormField(
                     // passwd 입력
+                    inputFormatters: [
+                      FilteringTextInputFormatter(RegExp('[a-z,A-Z,0-9,!-%,@]'),
+                          allow: true),
+                    ],
                     controller: passwdController,
                     maxLines: 1,
                     maxLength: 15,
@@ -264,6 +279,10 @@ class _SignInState extends State<SignIn> {
                   padding: EdgeInsets.all(1),
                 ),
                 TextFormField(
+                    inputFormatters: [
+                      FilteringTextInputFormatter(RegExp('[a-z,0-9,.,@,_]'),
+                          allow: true),
+                    ],
                     // 이메일주소 입력
                     controller: emailController,
                     maxLength: 30,
@@ -280,6 +299,10 @@ class _SignInState extends State<SignIn> {
                 ),
                 TextFormField(
                     // 이름
+                    inputFormatters: [
+                      FilteringTextInputFormatter(RegExp('[a-z,ㄱ-ㅎ|ㅏ-ㅣ|가-힣]'),
+                          allow: true),
+                    ],
                     maxLength: 10,
                     controller: nameController,
                     keyboardType: TextInputType.name,
@@ -295,12 +318,16 @@ class _SignInState extends State<SignIn> {
                 ),
                 TextFormField(
                     // 핸드폰 번호 입력
-                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+
+                    inputFormatters: [
+                      FilteringTextInputFormatter(RegExp('[0-9,-]'),
+                          allow: true),
+                    ],
                     controller: phoneController,
                     keyboardType: TextInputType.number,
-                    maxLength: 10,
+                    maxLength: 13,
                     decoration: InputDecoration(
-                        hintText: '핸드폰 번호("-" 제외)를 입력해주세요',
+                        hintText: '핸드폰 번호("-" 포함)를 입력해주세요',
                         suffixIcon: IconButton(
                           onPressed: () => phoneController.clear(),
                           icon: Icon(Icons.clear),
@@ -311,11 +338,14 @@ class _SignInState extends State<SignIn> {
                 ),
                 TextFormField(
                     // 군번 입력
-                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                    inputFormatters: [
+                      FilteringTextInputFormatter(RegExp('[0-9,-]'),
+                          allow: true),
+                    ],
                     controller: armyNumController,
                     keyboardType: TextInputType.text,
                     decoration: InputDecoration(
-                        hintText: '군번을 입력해주세요 ("-"을 제외하고 입력해주세요.)',
+                        hintText: '군번을 입력해주세요 ("-"을 포함하고 입력해주세요.)',
                         suffixIcon: IconButton(
                           onPressed: () => armyNumController.clear(),
                           icon: Icon(Icons.clear),
