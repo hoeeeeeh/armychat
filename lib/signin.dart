@@ -1,7 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/services.dart';
-
-import 'header.dart';
 import 'package:flutter/material.dart';
 
 class SignIn extends StatefulWidget {

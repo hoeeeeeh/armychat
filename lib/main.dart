@@ -73,13 +73,11 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
   }
 
   @override
   void dispose() {
-    // TODO: implement dispose
     super.dispose();
     idController.dispose();
     passwdController.dispose();
@@ -149,23 +147,6 @@ class _MyHomePageState extends State<MyHomePage> {
     }
 
     firebaseIDconfirm();
-    return;
-    if (idController.text == "admin" && passwdController.text == "admin") {
-      Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (context) =>
-                  Userinfo('DB에서 받아올 이름', 'backgol@naver.com')));
-    } else if (idController.text == "" || passwdController.text == "") {
-      _alert();
-      return;
-    } else {
-      _alert("아이디 혹은 비밀번호가 올바르지 않습니다.");
-      return;
-    }
-
-    id = idController.text;
-    passwd = passwdController.text;
   }
 
   @override

@@ -1,4 +1,3 @@
-import 'main.dart';
 import 'package:flutter/material.dart';
 
 class CounSel extends StatefulWidget {
@@ -62,7 +61,7 @@ class _CounSelState extends State<CounSel> {
     );
   }
 
-  bool isEmpty(bool checked) {
+  void isEmpty(bool checked) {
     setState(() {
       checked = !checked;
     });
@@ -74,7 +73,7 @@ class _CounSelState extends State<CounSel> {
     });
   }
 
-  void SetAnonymous(bool value) {
+  void setAnonymous(bool value) {
     setState(() {
       anonyCheck = !anonyCheck;
     });
@@ -182,7 +181,7 @@ class _CounSelState extends State<CounSel> {
                     Text('익명으로 상담하기'),
                     Center(
                         child: Checkbox(
-                      onChanged: SetAnonymous,
+                      onChanged: setAnonymous,
                       value: anonyCheck,
                     )),
                   ],

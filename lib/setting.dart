@@ -116,7 +116,6 @@ class MakingNotes extends StatefulWidget {
 }
 
 class _MakingNotesState extends State<MakingNotes> {
-  @override
   int count = 0;
   Timer _timer;
 
@@ -125,7 +124,6 @@ class _MakingNotesState extends State<MakingNotes> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     _start();
   }

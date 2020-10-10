@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/cupertino.dart';
 import 'header.dart' as header;
 
@@ -26,7 +25,6 @@ class ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
   TextEditingController _queryController = TextEditingController();
 
   // 텍스트필드에 입력된 데이터의 존재 여부
-  bool _isComposing = false;
 
   @override
   Widget build(BuildContext context) {
