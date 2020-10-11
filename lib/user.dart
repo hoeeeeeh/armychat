@@ -9,17 +9,18 @@ class Userinfo extends StatefulWidget {
   // final String title;
   final String userName;
   final String email;
+  final String id;
 
-  Userinfo(this.userName, this.email) {
+  Userinfo(this.userName, this.email, this.id) {
     print(userName + email);
   }
 
-  Userinfo.nonFastLogin(this.userName, this.email) {
+  Userinfo.nonFastLogin(this.userName, this.email, this.id) {
     print(userName + email);
   }
 
   @override
-  _UserinfoState createState() => _UserinfoState(userName, email);
+  _UserinfoState createState() => _UserinfoState(userName, email, id);
 }
 
 class _UserinfoState extends State<Userinfo> {
@@ -27,12 +28,13 @@ class _UserinfoState extends State<Userinfo> {
 
   final String userName;
   final String email;
+  final String id;
   List<Widget> _widgetArray;
 
-  _UserinfoState(this.userName, this.email) {
+  _UserinfoState(this.userName, this.email, this.id) {
     _widgetArray = <Widget>[
       home.Homepage(userName, email),
-      counselor.CounSel(),
+      counselor.CounSel(id),
       bot.ChatScreen(),
       setting.Setting(),
     ];

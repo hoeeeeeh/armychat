@@ -119,14 +119,6 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void _login([String id, String pw]) {
-    /*
-    if (id != null && pw != null) {
-      Navigator.push(
-          context, MaterialPageRoute(builder: (context) => Userinfo(id, pw)));
-      return;
-    }
-    */
-
     Future<void> firebaseIDconfirm() async {
       print(id);
       print(pw);
@@ -139,7 +131,8 @@ class _MyHomePageState extends State<MyHomePage> {
           Navigator.push(
               context,
               MaterialPageRoute(
-                  builder: (context) => Userinfo(user['name'], user['email'])));
+                  builder: (context) =>
+                      Userinfo(id, user['name'], user['email'])));
         }
       } else {
         _alert('아이디 혹은 비밀번호를 확인해주십시오.');

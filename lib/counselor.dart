@@ -1,7 +1,12 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class CounSel extends StatefulWidget {
-  CounSel({Key key, this.title}) : super(key: key);
+  //CounSel({Key key, this.title}) : super(key: key);
+  //final String title;
+  CounSel(this.id);
+  final String id;
 
   // This widget is the home page of your application. It is stateful, meaning
   // that it has a State object (defined below) that contains fields that affect
@@ -12,24 +17,44 @@ class CounSel extends StatefulWidget {
   // used by the build method of the State. Fields in a Widget subclass are
   // always marked "final".
 
-  final String title;
-
   @override
-  _CounSelState createState() => _CounSelState();
+  _CounSelState createState() => _CounSelState(id);
 }
 
 class _CounSelState extends State<CounSel> {
-  final idController = TextEditingController();
-  final passwdController = TextEditingController();
+  final textController = TextEditingController();
   final emailController = TextEditingController();
   final nameController = TextEditingController();
   final phoneController = TextEditingController();
   final armyNumController = TextEditingController();
+  final FirebaseFirestore firestore = FirebaseFirestore.instance;
+  final String id;
+  _CounSelState(this.id);
 
   String contents = "상담 내용을 입력해주세요.";
 
   bool checked = false; // 상담 신청 동의 체크
   bool anonyCheck = false;
+
+  Future<void> _submit(String email, String content,
+      [String name, String phoneNum, String armyNum]) async {
+    final temp = await firestore.collection("member").doc(id).get();
+    int counselCount = temp.data()['counselCount'];
+    counselCount++;
+    String str = 'counsel#($counselCount)';
+    final snapShot = await firestore
+        .collection("member")
+        .doc(id)
+        .collection("counsel")
+        .doc(str)
+        .set({
+      'content': content,
+      'email': email,
+      'name': name ?? 'anonymous',
+      'phoneNum': phoneNum ?? 'anonymous',
+      'armyNum': armyNum ?? 'anonymous',
+    });
+  }
 
   void _alert(String output) {
     showDialog(
@@ -85,7 +110,7 @@ class _CounSelState extends State<CounSel> {
         appBar: AppBar(
           // Here we take the value from the MyHomePage object that was created by
           // the App.build method, and use it to set our appbar title.
-          title: Text(widget.title ?? '육군 법률 상담소'),
+          title: Text('육군 법률 상담소'),
         ),
         body: SingleChildScrollView(
             child: Center(
@@ -130,16 +155,19 @@ class _CounSelState extends State<CounSel> {
                               child: Center(
                                   child: TextFormField(
                                       // id 입력
-                                      controller: idController,
+
+                                      textAlign: TextAlign.center,
+                                      controller: textController,
                                       keyboardType: TextInputType.text,
-                                      maxLength: 1000,
+                                      //maxLength: 1000,
+                                      maxLines: 50,
                                       decoration: InputDecoration(
                                           hintText: '상담내용을 입력해주세요',
-                                          suffixIcon: IconButton(
-                                            onPressed: () =>
-                                                idController.clear(),
-                                            icon: Icon(Icons.clear),
-                                          ),
+                                          // suffixIcon: IconButton(
+                                          //   onPressed: () =>
+                                          //       idController.clear(),
+                                          //   icon: Icon(Icons.clear),
+                                          // ),
                                           border: OutlineInputBorder()))),
                             ))),
                     Container(
@@ -249,7 +277,12 @@ class _CounSelState extends State<CounSel> {
                 Center(
                   child: RaisedButton(
                       child: Text("접수하기"),
-                      onPressed: () => _alert("상담이 접수되었습니다.")),
+                      onPressed: () => _submit(
+                          textController.text,
+                          emailController.text,
+                          nameController.text,
+                          phoneController.text,
+                          armyNumController.text)),
                 ),
 
                 //Text('Your PW: $passwd'),
