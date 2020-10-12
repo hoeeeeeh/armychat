@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/services.dart';
 
 class CounSel extends StatefulWidget {
   //CounSel({Key key, this.title}) : super(key: key);
@@ -29,8 +30,31 @@ class _CounSelState extends State<CounSel> {
   final armyNumController = TextEditingController();
   final FirebaseFirestore firestore = FirebaseFirestore.instance;
   final String id;
-  _CounSelState(this.id);
+  String _email;
+  String _name;
+  String _phone;
+  String _armyNum;
 
+  @override
+  void initState() {
+    super.initState();
+    init();
+  }
+
+  Future<void> init() async {
+    final temp = await firestore.collection("member").doc(id).get();
+    _email = temp.data()['email'];
+    _phone = temp.data()['phoneNum'];
+    _armyNum = temp.data()['armyNum'];
+    _name = temp.data()['name'];
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
+  _CounSelState(this.id);
   String contents = "상담 내용을 입력해주세요.";
 
   bool checked = false; // 상담 신청 동의 체크
@@ -38,11 +62,14 @@ class _CounSelState extends State<CounSel> {
 
   Future<void> _submit(String email, String content,
       [String name, String phoneNum, String armyNum]) async {
+    print('id : $id');
+    print(name);
     final temp = await firestore.collection("member").doc(id).get();
-    int counselCount = temp.data()['counselCount'];
+    int counselCount = temp.data()['counselCount'] ?? 0;
     counselCount++;
+
     String str = 'counsel#($counselCount)';
-    final snapShot = await firestore
+    await firestore
         .collection("member")
         .doc(id)
         .collection("counsel")
@@ -50,10 +77,16 @@ class _CounSelState extends State<CounSel> {
         .set({
       'content': content,
       'email': email,
-      'name': name ?? 'anonymous',
-      'phoneNum': phoneNum ?? 'anonymous',
-      'armyNum': armyNum ?? 'anonymous',
+      'name': name != "" ? name : 'anonymous',
+      'phoneNum': phoneNum != "" ? phoneNum : 'anonymous',
+      'armyNum': armyNum != "" ? armyNum : 'anonymous',
     });
+
+    _alert('상담 접수가 완료되었습니다.');
+    firestore
+        .collection('member')
+        .doc(id)
+        .update({'counselCount': counselCount});
   }
 
   void _alert(String output) {
@@ -189,17 +222,24 @@ class _CounSelState extends State<CounSel> {
                   padding: EdgeInsets.all(10),
                 ),
                 TextFormField(
-                    // 이메일주소 입력
-                    controller: emailController,
-                    maxLength: 30,
-                    keyboardType: TextInputType.emailAddress,
-                    decoration: InputDecoration(
-                        hintText: '답변을 받을 이메일을 입력해주세요',
-                        suffixIcon: IconButton(
-                          onPressed: () => emailController.clear(),
-                          icon: Icon(Icons.clear),
-                        ),
-                        border: OutlineInputBorder())),
+                  // 이메일주소 입력
+                  inputFormatters: [
+                    FilteringTextInputFormatter(RegExp('[a-z,0-9,.,@,_]'),
+                        allow: true),
+                  ],
+                  controller: emailController,
+                  maxLength: 30,
+                  keyboardType: TextInputType.emailAddress,
+                  decoration: InputDecoration(
+                      hintText: '답변을 받을 이메일을 입력해주세요',
+                      suffixIcon: IconButton(
+                        onPressed: () => emailController.clear(),
+                        icon: Icon(Icons.clear),
+                      ),
+                      border: OutlineInputBorder()),
+                  onTap: () => {emailController.text = _email},
+                ),
+
                 Padding(
                   padding: EdgeInsets.all(3),
                 ),
@@ -220,49 +260,65 @@ class _CounSelState extends State<CounSel> {
                 ),
 
                 TextFormField(
-                    // 이름
-                    enabled: !anonyCheck,
-                    maxLength: 10,
-                    controller: nameController,
-                    keyboardType: TextInputType.name,
-                    decoration: InputDecoration(
-                        hintText: '이름을 입력해주세요',
-                        suffixIcon: IconButton(
-                          onPressed: () => nameController.clear(),
-                          icon: Icon(Icons.clear),
-                        ),
-                        border: OutlineInputBorder())),
+                  // 이름
+                  inputFormatters: [
+                    FilteringTextInputFormatter(RegExp('[a-z,ㄱ-ㅎ|ㅏ-ㅣ|가-힣]'),
+                        allow: true),
+                  ],
+                  enabled: !anonyCheck,
+                  maxLength: 10,
+                  controller: nameController,
+                  keyboardType: TextInputType.name,
+                  decoration: InputDecoration(
+                      hintText: '이름을 입력해주세요',
+                      suffixIcon: IconButton(
+                        onPressed: () => nameController.clear(),
+                        icon: Icon(Icons.clear),
+                      ),
+                      border: OutlineInputBorder()),
+                  onTap: () => {nameController.text = _name},
+                ),
                 Padding(
                   padding: EdgeInsets.all(1),
                 ),
                 TextFormField(
-                    // 핸드폰 번호 입력
-                    enabled: !anonyCheck,
-                    controller: phoneController,
-                    keyboardType: TextInputType.number,
-                    maxLength: 10,
-                    decoration: InputDecoration(
-                        hintText: '핸드폰 번호("-" 제외)를 입력해주세요',
-                        suffixIcon: IconButton(
-                          onPressed: () => phoneController.clear(),
-                          icon: Icon(Icons.clear),
-                        ),
-                        border: OutlineInputBorder())),
+                  inputFormatters: [
+                    FilteringTextInputFormatter(RegExp('[0-9,-]'), allow: true),
+                  ],
+                  // 핸드폰 번호 입력
+                  enabled: !anonyCheck,
+                  controller: phoneController,
+                  keyboardType: TextInputType.number,
+                  maxLength: 13,
+                  decoration: InputDecoration(
+                      hintText: '핸드폰 번호("-" 포함)를 입력해주세요',
+                      suffixIcon: IconButton(
+                        onPressed: () => phoneController.clear(),
+                        icon: Icon(Icons.clear),
+                      ),
+                      border: OutlineInputBorder()),
+                  onTap: () => {phoneController.text = _phone},
+                ),
                 Padding(
                   padding: EdgeInsets.all(1),
                 ),
                 TextFormField(
-                    // 군번 입력
-                    enabled: !anonyCheck,
-                    controller: armyNumController,
-                    keyboardType: TextInputType.text,
-                    decoration: InputDecoration(
-                        hintText: '군번을 입력해주세요 ("-"을 제외하고 입력해주세요.)',
-                        suffixIcon: IconButton(
-                          onPressed: () => armyNumController.clear(),
-                          icon: Icon(Icons.clear),
-                        ),
-                        border: OutlineInputBorder())),
+                  // 군번 입력
+                  inputFormatters: [
+                    FilteringTextInputFormatter(RegExp('[0-9,-]'), allow: true),
+                  ],
+                  enabled: !anonyCheck,
+                  controller: armyNumController,
+                  keyboardType: TextInputType.text,
+                  decoration: InputDecoration(
+                      hintText: '군번을 입력해주세요 ("-"을 포함하고 입력해주세요.)',
+                      suffixIcon: IconButton(
+                        onPressed: () => armyNumController.clear(),
+                        icon: Icon(Icons.clear),
+                      ),
+                      border: OutlineInputBorder()),
+                  onTap: () => {armyNumController.text = _armyNum},
+                ),
                 Padding(
                   padding: EdgeInsets.only(bottom: 10),
                 ),
@@ -277,12 +333,19 @@ class _CounSelState extends State<CounSel> {
                 Center(
                   child: RaisedButton(
                       child: Text("접수하기"),
-                      onPressed: () => _submit(
-                          textController.text,
-                          emailController.text,
-                          nameController.text,
-                          phoneController.text,
-                          armyNumController.text)),
+                      onPressed: () => {
+                            _submit(
+                                emailController.text,
+                                textController.text,
+                                nameController.text,
+                                phoneController.text,
+                                armyNumController.text),
+                            textController.clear(),
+                            emailController.clear(),
+                            nameController.clear(),
+                            phoneController.clear(),
+                            armyNumController.clear(),
+                          }),
                 ),
 
                 //Text('Your PW: $passwd'),

@@ -132,7 +132,7 @@ class _MyHomePageState extends State<MyHomePage> {
               context,
               MaterialPageRoute(
                   builder: (context) =>
-                      Userinfo(id, user['name'], user['email'])));
+                      Userinfo(user['name'], user['email'], id)));
         }
       } else {
         _alert('아이디 혹은 비밀번호를 확인해주십시오.');
