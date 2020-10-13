@@ -23,6 +23,7 @@ class CounSel extends StatefulWidget {
 }
 
 class _CounSelState extends State<CounSel> {
+  final titleController = TextEditingController();
   final textController = TextEditingController();
   final emailController = TextEditingController();
   final nameController = TextEditingController();
@@ -55,12 +56,13 @@ class _CounSelState extends State<CounSel> {
   }
 
   _CounSelState(this.id);
+  //String cont_title = "상담 제목을 입력해주세요.";
   String contents = "상담 내용을 입력해주세요.";
 
   bool checked = false; // 상담 신청 동의 체크
   bool anonyCheck = false;
 
-  Future<void> _submit(String email, String content,
+  Future<void> _submit(String title, String email, String content,
       [String name, String phoneNum, String armyNum]) async {
     print('id : $id');
     print(name);
@@ -75,6 +77,7 @@ class _CounSelState extends State<CounSel> {
         .collection("counsel")
         .doc(str)
         .set({
+      'title': title,
       'content': content,
       'email': email,
       'name': name != "" ? name : 'anonymous',
@@ -172,6 +175,21 @@ class _CounSelState extends State<CounSel> {
                   padding: EdgeInsets.fromLTRB(20, 0, 20, 10),
                   child: Text('법률 상담'),
                 ),
+                TextFormField(
+                    textAlign: TextAlign.center,
+                    controller: titleController,
+                    keyboardType: TextInputType.text,
+                    maxLength: 20,
+                    //maxLines: 50,
+                    decoration: InputDecoration(
+                        hintText: '상담 제목을 입력해주세요',
+                        // suffixIcon: IconButton(
+                        //   onPressed: () =>
+                        //       idController.clear(),
+                        //   icon: Icon(Icons.clear),
+                        // ),
+                        border: OutlineInputBorder())),
+                Padding(padding: EdgeInsets.only(bottom: 20)),
                 Padding(
                   padding: EdgeInsets.all(10),
                 ),
@@ -195,13 +213,14 @@ class _CounSelState extends State<CounSel> {
                                       //maxLength: 1000,
                                       maxLines: 50,
                                       decoration: InputDecoration(
-                                          hintText: '상담내용을 입력해주세요',
-                                          // suffixIcon: IconButton(
-                                          //   onPressed: () =>
-                                          //       idController.clear(),
-                                          //   icon: Icon(Icons.clear),
-                                          // ),
-                                          border: OutlineInputBorder()))),
+                                        hintText: '상담내용을 입력해주세요',
+                                        // suffixIcon: IconButton(
+                                        //   onPressed: () =>
+                                        //       idController.clear(),
+                                        //   icon: Icon(Icons.clear),
+                                        // ),
+                                        //border: OutlineInputBorder()
+                                      ))),
                             ))),
                     Container(
                       height: 50,
@@ -335,6 +354,7 @@ class _CounSelState extends State<CounSel> {
                       child: Text("접수하기"),
                       onPressed: () => {
                             _submit(
+                                titleController.text,
                                 emailController.text,
                                 textController.text,
                                 nameController.text,

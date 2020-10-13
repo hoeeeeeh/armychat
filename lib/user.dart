@@ -33,7 +33,7 @@ class _UserinfoState extends State<Userinfo> {
 
   _UserinfoState(this.userName, this.email, this.id) {
     _widgetArray = <Widget>[
-      home.Homepage(userName, email),
+      home.Homepage(id, userName, email),
       counselor.CounSel(id),
       bot.ChatScreen(),
       setting.Setting(),

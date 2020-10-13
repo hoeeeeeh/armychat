@@ -1,26 +1,79 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:flutter/material.dart';
 
 class Homepage extends StatefulWidget {
+  final String id;
   final String userName;
   final String email;
-  Homepage(this.userName, this.email);
+  Homepage(this.id, this.userName, this.email);
 
   @override
-  _HomepageState createState() => _HomepageState(userName, email);
+  _HomepageState createState() => _HomepageState(id, userName, email);
 }
 
 class _HomepageState extends State<Homepage> {
   var _calendarController;
 
+  final FirebaseFirestore firestore = FirebaseFirestore.instance;
+
   final String userName;
   final String email;
+  final String id;
 
-  _HomepageState(this.userName, this.email);
+  List<ListTile> counselList = [];
+
+  int counselCount;
+
+  _HomepageState(this.id, this.userName, this.email);
 
   void initState() {
     super.initState();
+    init();
+
     _calendarController = CalendarController();
+  }
+
+  Future<void> init() async {
+    final temp = await firestore.collection("member").doc(id).get();
+
+    counselCount = temp.data()['counselCount'] ?? 0;
+    int count = 0;
+    String title = "";
+
+    if (counselCount == 0) {
+      print('yes');
+      setState(() {
+        counselList.add(ListTile(
+            title: Text(
+          '예약된 상담이 없습니다.',
+          textAlign: TextAlign.center,
+        )));
+      });
+      return;
+    }
+
+    for (int i = 0; i < counselCount; i++) {
+      count = i + 1;
+
+      final temp2 = await firestore
+          .collection("member")
+          .doc(id)
+          .collection('counsel')
+          .doc('counsel#($count)')
+          .get();
+
+      title = temp2.data()['title'];
+      setState(() {
+        counselList.add(
+          ListTile(
+              title: Text('상담#$count :: $title'),
+              leading: i == 0
+                  ? Icon(Icons.bookmark)
+                  : Icon(Icons.bookmark_border_outlined)),
+        );
+      });
+    }
   }
 
   @override
@@ -64,16 +117,7 @@ class _HomepageState extends State<Homepage> {
                   child: ListView(
                 children: ListTile.divideTiles(
                   context: context,
-                  tiles: [
-                    ListTile(
-                        title: Text('예약한 상담 1'), leading: Icon(Icons.bookmark)),
-                    ListTile(
-                        title: Text('예약한 상담 2'),
-                        leading: Icon(Icons.bookmark_border_outlined)),
-                    ListTile(
-                        title: Text('예약한 상담 3'),
-                        leading: Icon(Icons.bookmark_border_outlined)),
-                  ],
+                  tiles: counselList,
                 ).toList(),
               )),
             )
