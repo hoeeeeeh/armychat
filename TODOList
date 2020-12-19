@@ -4,3 +4,5 @@
 
 : whoSaid TRUE : OWNER / FALSE : OPPOSITE
 : whatSaid
+
+둘 다 온라인 상태면 whatSaid 를 계속 업데이트 할 수 있는데, 한 쪽만 온라인인 상태에서 대화가 이어지면 ?
