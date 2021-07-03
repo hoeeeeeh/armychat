@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>466470465489-8rsoqhf6997pkt25st0j42bt0dtnv80q.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.466470465489-8rsoqhf6997pkt25st0j42bt0dtnv80q</string>
+	<key>ANDROID_CLIENT_ID</key>
+	<string>466470465489-9di02gi7h2gg5ncpad2tf7c7ud6c7oon.apps.googleusercontent.com</string>
+	<key>API_KEY</key>
+	<string>AIzaSyCVWmOJG_mgkl22P76i60WVR5ersiif5m8</string>
+	<key>GCM_SENDER_ID</key>
+	<string>466470465489</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.example.armyChatbot</string>
+	<key>PROJECT_ID</key>
+	<string>armychatbot-d1e94</string>
+	<key>STORAGE_BUCKET</key>
+	<string>armychatbot-d1e94.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false/>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false/>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true/>
+	<key>IS_GCM_ENABLED</key>
+	<true/>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true/>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:466470465489:ios:8154a77c8098dc69f67af0</string>
+	<key>DATABASE_URL</key>
+	<string>https://armychatbot-d1e94.firebaseio.com</string>
+</dict>
+</plist>

@@ -22,7 +22,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Army ChatBot',
-      theme: header.isDarkMode ? header.darkModeTheme : header.defaultTheme,
+      theme: !header.isDarkMode ? header.darkModeTheme : header.defaultTheme,
       home: FirebaseInit(),
     );
   }
@@ -106,7 +106,7 @@ class _MyHomePageState extends State<MyHomePage> {
           title: new Text("입력"),
           content: new Text(text ?? "아이디 혹은 비밀번호를 입력해주세요"),
           actions: <Widget>[
-            new FlatButton(
+            new TextButton(
               child: new Text("닫기"),
               onPressed: () {
                 Navigator.pop(context);
@@ -123,11 +123,20 @@ class _MyHomePageState extends State<MyHomePage> {
       print(id);
       print(pw);
 
+      /* 테스트용!! */
+      
+      //id = 'admin';
+      //pw = 'admin';
+
       final snapShot = await firestore.collection("member").doc(id).get();
       if (snapShot.exists) {
         var user = snapShot.data();
         if (user['passwd'] == pw) {
           print('ggg');
+          header.userArmyNum = user['armyNum'];
+          header.userEmail = user['email'];
+          header.userName = user['name'];
+          header.userId = user['id'];
           Navigator.push(
               context,
               MaterialPageRoute(
@@ -144,169 +153,139 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
     return Scaffold(
-        resizeToAvoidBottomPadding: false,
-        appBar: AppBar(
-          // Here we take the value from the MyHomePage object that was created by
-          // the App.build method, and use it to set our appbar title.
-          title: Text(widget.title ?? 'ARMY CHATBOT'),
-        ),
+        // resizeToAvoidBottomPadding: false,
         body: Center(
-          child: Container(
-            padding: EdgeInsets.fromLTRB(20, 20, 20, 20),
-            // Center is a layout widget. It takes a single child and positions it
-            // in the middle of the parent.
-            child: Column(
-              // Column is also a layout widget. It takes a list of children and
-              // arranges them vertically. By default, it sizes itself to fit its
-              // children horizontally, and tries to be as tall as its parent.
-              //
-              // Invoke "debug painting" (press "p" in the console, choose the
-              // "Toggle Debug Paint" action from the Flutter Inspector in Android
-              // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
-              // to see the wireframe for each widget.
-              //
-              // Column has various properties to control how it sizes itself and
-              // how it positions its children. Here we use mainAxisAlignment to
-              // center the children vertically; the main axis here is the vertical
-              // axis because Columns are vertical (the cross axis would be
-              // horizontal).
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Container(
-                  padding: EdgeInsets.fromLTRB(20, 20, 20, 20),
-                  child: Text('육군 규정 상담 챗봇, "아미챗봇" '),
-                ),
-                TextFormField(
-                    inputFormatters: [
-                      FilteringTextInputFormatter(RegExp('[a-z,0-9]'),
-                          allow: true),
-                    ], // 문자만 허용
-                    controller: idController,
-                    keyboardType: TextInputType.emailAddress,
-                    decoration: InputDecoration(
-                        hintText: '아이디를 입력해주세요',
-                        suffixIcon: IconButton(
-                          onPressed: () => idController.clear(),
-                          icon: Icon(Icons.clear),
-                        ),
-                        border: OutlineInputBorder())),
-                Padding(
-                  padding: EdgeInsets.all(1),
-                ),
-                TextFormField(
-                    controller: passwdController,
-                    keyboardType: TextInputType.visiblePassword,
-                    obscureText: true,
-                    decoration: InputDecoration(
-                        hintText: '비밀번호를 입력해주세요',
-                        suffixIcon: IconButton(
-                          onPressed: () => idController.clear(),
-                          icon: Icon(Icons.clear),
-                        ),
-                        border: OutlineInputBorder())),
-                Center(
-                    child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: <Widget>[
-                      RaisedButton(
-                          child: Text('로그인'),
-                          onPressed: () {
-                            _login(idController.text, passwdController.text);
-                          }),
-                      Padding(
-                        padding: EdgeInsets.only(left: 10),
-                      ),
-                      RaisedButton(
-                          child: Text('회원가입'),
-                          onPressed: () {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => SignIn()));
-                          }),
-                    ])),
-                Padding(padding: EdgeInsets.only(bottom: 20)),
-
-                Container(
-                  height: 30,
-                  //color: Colors.black,
-                  child: Stack(
-                    children: [
-                      Positioned(
-                        top: 15,
-                        left: 0,
-                        right: 230,
-                        child: Container(
-                          margin: EdgeInsets.only(bottom: 20.0),
-                          alignment: Alignment.topCenter,
-                          height: 1.0,
-                          decoration: BoxDecoration(
-                              border: Border(
-                                  bottom: BorderSide(
-                                      color: Colors.black, width: 1))),
-                        ),
-                      ),
-                      Positioned(
-                          top: 0,
-                          bottom: 1,
-                          left: 140,
-                          right: 140,
-                          child: Container(
-                            child: Text(
-                              '또는',
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                  fontSize: 25, fontFamily: 'GamjaFlower'),
-                            ),
-                          )),
-                      Positioned(
-                        top: 15,
-                        left: 230,
-                        right: 0,
-                        child: Container(
-                          margin: EdgeInsets.only(bottom: 20.0),
-                          alignment: Alignment.topCenter,
-                          height: 1.0,
-                          decoration: BoxDecoration(
-                              border: Border(
-                                  bottom: BorderSide(
-                                      color: Colors.black, width: 1))),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-
-                Padding(padding: EdgeInsets.only(bottom: 20)),
-                Center(
-                  child: Column(
-                    children: [
-                      SignInButton(Buttons.Google, onPressed: () {
-                        _handleSignIn().then((user) {
-                          print(user);
-                          _login(user.displayName, user.email);
-                        });
-                      }),
-                      SignInButton(Buttons.Facebook, onPressed: () {
-                        _signOut();
-                      }),
-                      // SignInButton(Buttons.Apple, onPressed: () {}),
-                    ],
-                  ),
-                )
-                //Text('Your ID: $id'),
-                //Text('Your PW: $passwd'),
-              ],
+      child: Container(
+        padding: EdgeInsets.fromLTRB(20, 20, 20, 20),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Container(
+              padding: EdgeInsets.fromLTRB(20, 20, 20, 20),
+              child: Text('육군 인권 상담소, "아미챗" '),
             ),
-          ),
-        )
+            TextFormField(
+                inputFormatters: [
+                  FilteringTextInputFormatter(RegExp('[a-z,0-9]'), allow: true),
+                ], // 문자만 허용
+                controller: idController,
+                keyboardType: TextInputType.emailAddress,
+                decoration: InputDecoration(
+                    hintText: '아이디를 입력해주세요',
+                    suffixIcon: IconButton(
+                      onPressed: () => idController.clear(),
+                      icon: Icon(Icons.clear),
+                    ),
+                    border: OutlineInputBorder())),
+            Padding(
+              padding: EdgeInsets.all(1),
+            ),
+            TextFormField(
+                controller: passwdController,
+                keyboardType: TextInputType.visiblePassword,
+                obscureText: true,
+                decoration: InputDecoration(
+                    hintText: '비밀번호를 입력해주세요',
+                    suffixIcon: IconButton(
+                      onPressed: () => idController.clear(),
+                      icon: Icon(Icons.clear),
+                    ),
+                    border: OutlineInputBorder())),
+            Center(
+                child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                  ElevatedButton(
+                      child: Text('로그인'),
+                      onPressed: () {
+                        _login(idController.text, passwdController.text);
+                      }),
+                  Padding(
+                    padding: EdgeInsets.only(left: 10),
+                  ),
+                  ElevatedButton(
+                      child: Text('회원가입'),
+                      onPressed: () {
+                        Navigator.push(context,
+                            MaterialPageRoute(builder: (context) => SignIn()));
+                      }),
+                ])),
+            Padding(padding: EdgeInsets.only(bottom: 20)),
+
+            Container(
+              height: 30,
+              //color: Colors.black,
+              child: Stack(
+                children: [
+                  Positioned(
+                    top: 15,
+                    left: 0,
+                    right: 230,
+                    child: Container(
+                      margin: EdgeInsets.only(bottom: 20.0),
+                      alignment: Alignment.topCenter,
+                      height: 1.0,
+                      decoration: BoxDecoration(
+                          border: Border(
+                              bottom:
+                                  BorderSide(color: Colors.black, width: 1))),
+                    ),
+                  ),
+                  Positioned(
+                      top: 0,
+                      bottom: 1,
+                      left: 140,
+                      right: 140,
+                      child: Container(
+                        child: Text(
+                          '또는',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                              fontSize: 25, fontFamily: 'GamjaFlower'),
+                        ),
+                      )),
+                  Positioned(
+                    top: 15,
+                    left: 230,
+                    right: 0,
+                    child: Container(
+                      margin: EdgeInsets.only(bottom: 20.0),
+                      alignment: Alignment.topCenter,
+                      height: 1.0,
+                      decoration: BoxDecoration(
+                          border: Border(
+                              bottom:
+                                  BorderSide(color: Colors.black, width: 1))),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            Padding(padding: EdgeInsets.only(bottom: 20)),
+            Center(
+              child: Column(
+                children: [
+                  SignInButton(Buttons.Google, onPressed: () {
+                    _handleSignIn().then((user) {
+                      print(user);
+                      _login(user.displayName, user.email);
+                    });
+                  }),
+                  SignInButton(Buttons.Facebook, onPressed: () {
+                    _signOut();
+                  }),
+                  // SignInButton(Buttons.Apple, onPressed: () {}),
+                ],
+              ),
+            )
+            //Text('Your ID: $id'),
+            //Text('Your PW: $passwd'),
+          ],
+        ),
+      ),
+    )
         // This trailing comma makes auto-formatting nicer for build methods.
         );
   }
@@ -321,12 +300,12 @@ class FirebaseInit extends StatelessWidget {
       builder: (context, snapshot) {
         // Check for errors
         if (snapshot.hasError) {
-          return Text('what the fuck');
+          return Text('에러가 발생했습니다. 관리자(hoeeeeeh@naver.com)에게 문의해주세요.');
         }
 
         // Once complete, show your application
         if (snapshot.connectionState == ConnectionState.done) {
-          return MyHomePage(title: 'Army ChatBot');
+          return MyHomePage(title: '아미챗');
         }
 
         // Otherwise, show something whilst waiting for initialization to complete

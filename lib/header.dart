@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 
@@ -8,7 +9,7 @@ final ThemeData kIOSTheme = ThemeData(
 
 // 기본 테마
 final ThemeData defaultTheme = ThemeData(
-  primarySwatch: Colors.purple,
+  primarySwatch: Colors.grey,
   // 전송버튼에 적용할 색상으로 이용
   accentColor: Colors.orangeAccent[400],
 );
@@ -24,6 +25,9 @@ bool isDarkMode = true;
 String userName = "이름";
 String userEmail = "";
 String userArmyNum = "";
+String userId = 'id';
+
+final FirebaseAuth _auth = FirebaseAuth.instance;
 
 /*
 

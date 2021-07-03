@@ -25,11 +25,19 @@ class _HomepageState extends State<Homepage> {
 
   int counselCount;
 
+  bool isDisposed = false;
+
   _HomepageState(this.id, this.userName, this.email);
 
   void initState() {
-    super.initState();
-    init();
+    if (!isDisposed) {
+      super.initState();
+      try {
+        init();
+      } catch (e) {
+        print('$e Async 동기 작업 중 Dispose 발생');
+      }
+    }
 
     _calendarController = CalendarController();
   }
@@ -41,7 +49,7 @@ class _HomepageState extends State<Homepage> {
     int count = 0;
     String title = "";
 
-    if (counselCount == 0) {
+    if (counselCount == 0 && mounted) { // mounted == 위젯 트리 안에 현재 남아있을 경우
       print('yes');
       setState(() {
         counselList.add(ListTile(
@@ -64,15 +72,17 @@ class _HomepageState extends State<Homepage> {
           .get();
 
       title = temp2.data()['title'];
-      setState(() {
-        counselList.add(
-          ListTile(
-              title: Text('상담#$count :: $title'),
-              leading: i == 0
-                  ? Icon(Icons.bookmark)
-                  : Icon(Icons.bookmark_border_outlined)),
-        );
-      });
+      if (mounted) {
+        setState(() {
+          counselList.add(
+            ListTile(
+                title: Text('상담#$count :: $title'),
+                leading: i == 0
+                    ? Icon(Icons.bookmark)
+                    : Icon(Icons.bookmark_border_outlined)),
+          );
+        });
+      }
     }
   }
 
@@ -80,50 +90,50 @@ class _HomepageState extends State<Homepage> {
   void dispose() {
     _calendarController.dispose();
     super.dispose();
+    isDisposed = true;
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('홈'),
+    return SafeArea(
+      child: Scaffold(
+        body: SingleChildScrollView(
+            child: SizedBox(
+          //width: 400,
+          child: Column(
+            children: [
+              Padding(
+                padding: EdgeInsets.only(bottom: 20),
+              ),
+              Center(child: Text(userName + '님(' + email + ') 어서오세요.')),
+              Padding(padding: EdgeInsets.only(bottom: 20)),
+              Container(
+                padding: EdgeInsets.only(top: 20.0),
+                child: Text('내 상담 확인하기'),
+                decoration: BoxDecoration(
+                    border: Border(
+                        bottom: BorderSide(
+                  color: Colors.black,
+                  width: 2.0,
+                ))),
+              ),
+              TableCalendar(
+                calendarController: _calendarController,
+              ),
+              SizedBox(
+                height: 600,
+                child: Center(
+                    child: ListView(
+                  children: ListTile.divideTiles(
+                    context: context,
+                    tiles: counselList,
+                  ).toList(),
+                )),
+              )
+            ],
+          ),
+        )),
       ),
-      body: SingleChildScrollView(
-          child: SizedBox(
-        width: 400,
-        child: Column(
-          children: [
-            Padding(
-              padding: EdgeInsets.only(bottom: 20),
-            ),
-            Text(userName + '님(' + email + ') 어서오세요.'),
-            Padding(padding: EdgeInsets.only(bottom: 20)),
-            Container(
-              padding: EdgeInsets.only(top: 20.0),
-              child: Text('내 상담 확인하기'),
-              decoration: BoxDecoration(
-                  border: Border(
-                      bottom: BorderSide(
-                color: Colors.black,
-                width: 2.0,
-              ))),
-            ),
-            TableCalendar(
-              calendarController: _calendarController,
-            ),
-            SizedBox(
-              height: 600,
-              child: Center(
-                  child: ListView(
-                children: ListTile.divideTiles(
-                  context: context,
-                  tiles: counselList,
-                ).toList(),
-              )),
-            )
-          ],
-        ),
-      )),
     );
   }
 }

@@ -1,20 +1,26 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
-import 'header.dart' as header;
+import '../header.dart' as header;
 
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:bubble/bubble.dart'; // chatbot 테스트 위해 추가
 
 class ChatScreen extends StatefulWidget {
-  ChatScreenState createState() => ChatScreenState();
+  final DocumentSnapshot document;
+  ChatScreen(this.document);
+
+  ChatScreenState createState() => ChatScreenState(document);
 }
 
 // 화면 구성용 상태 위젯. 애니메이션 효과를 위해 TickerProviderStateMixin를 가짐
 class ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
   // 입력한 메시지를 저장하는 리스트
+  final DocumentSnapshot document;
   final List<ChatMessage> _message = <ChatMessage>[];
 
+  ChatScreenState(this.document);
   //사용자별 고유 ID 생성
   final GlobalKey<AnimatedListState> _listKey = GlobalKey();
 
@@ -28,39 +34,53 @@ class ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        centerTitle: true,
-        title: Text("챗봇 상담소"),
-      ),
-      body: Stack(
-        children: <Widget>[
-          AnimatedList(
-              // key to call remove and insert from anywhere
-              key: _listKey,
-              initialItemCount: _message.length,
-              itemBuilder:
-                  (BuildContext context, int index, Animation animation) {
-                return _buildItem(_message[index], animation, index);
-              }),
-          Align(
-            alignment: Alignment.bottomCenter,
-            child: TextField(
-              decoration: InputDecoration(
-                icon: Icon(
-                  Icons.message,
-                  color: Colors.greenAccent,
-                ),
-                hintText: "Hello",
+    return Container(
+      color: Colors.white,
+      child: SafeArea(
+        child: Scaffold(
+          appBar: PreferredSize(
+            preferredSize: Size.fromHeight(50.0),
+            child: AppBar(
+              leading: new IconButton(
+                icon: new Icon(Icons.arrow_back, size: 30),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
               ),
-              controller: _queryController,
-              textInputAction: TextInputAction.send,
-              onSubmitted: (msg) {
-                this._getResponse();
-              },
+              backgroundColor: Colors.transparent,
+              title: Text(document.data()['name'] + "님 과의 대화"),
             ),
-          )
-        ],
+          ),
+          body: Stack(
+            children: <Widget>[
+              AnimatedList(
+                  // key to call remove and insert from anywhere
+                  key: _listKey,
+                  initialItemCount: _message.length,
+                  itemBuilder:
+                      (BuildContext context, int index, Animation animation) {
+                    return _buildItem(_message[index], animation, index);
+                  }),
+              Align(
+                alignment: Alignment.bottomCenter,
+                child: TextField(
+                  decoration: InputDecoration(
+                    icon: Icon(
+                      Icons.message,
+                      color: Colors.greenAccent,
+                    ),
+                    hintText: "채팅을 입력해주세요.",
+                  ),
+                  controller: _queryController,
+                  textInputAction: TextInputAction.send,
+                  onSubmitted: (msg) {
+                    this._getResponse();
+                  },
+                ),
+              )
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -106,18 +126,20 @@ class ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
   Widget _buildItem(ChatMessage item, Animation animation, int index) {
     String chatcontent = item.text;
     bool mine = chatcontent.endsWith("<bot>");
-    return SizeTransition(
-        sizeFactor: animation,
-        child: Padding(
-          padding: EdgeInsets.only(top: 10),
-          child: Container(
-              alignment: mine ? Alignment.topLeft : Alignment.topRight,
-              child: Bubble(
-                child: Text(chatcontent.replaceAll("<bot>", "")),
-                color: mine ? Colors.blue : Colors.indigo,
-                padding: BubbleEdges.all(10),
-              )),
-        ));
+    return SafeArea(
+      child: SizeTransition(
+          sizeFactor: animation,
+          child: Padding(
+            padding: EdgeInsets.only(top: 10),
+            child: Container(
+                alignment: mine ? Alignment.topLeft : Alignment.topRight,
+                child: Bubble(
+                  child: Text(chatcontent.replaceAll("<bot>", "")),
+                  color: mine ? Colors.blue : Colors.indigo,
+                  padding: BubbleEdges.all(10),
+                )),
+          )),
+    );
   }
 }
 
@@ -130,39 +152,41 @@ class ChatMessage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // 위젯에 애니메이션을 발생하기 위해 SizeTransition을 추가
-    return SizeTransition(
-      // 사용할 애니메이션 효과 설정
-      sizeFactor:
-          CurvedAnimation(parent: animationController, curve: Curves.easeOut),
-      axisAlignment: 0.0,
-      // 리스트뷰에 추가될 컨테이너 위젯
-      child: Container(
-        margin: const EdgeInsets.symmetric(vertical: 10.0),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Container(
-              margin: const EdgeInsets.only(right: 16.0),
-              // 사용자명의 첫번째 글자를 서클 아바타로 표시
-              child: CircleAvatar(child: Text(header.userName[0])),
-            ),
-            Expanded(
-              // 컬럼 추가
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  // 사용자명을 subhead 테마로 출력
-                  Text(header.userName,
-                      style: Theme.of(context).textTheme.subtitle1),
-                  // 입력받은 메시지 출력
-                  Container(
-                    margin: const EdgeInsets.only(top: 5.0),
-                    child: Text(text),
-                  ),
-                ],
+    return SafeArea(
+      child: SizeTransition(
+        // 사용할 애니메이션 효과 설정
+        sizeFactor:
+            CurvedAnimation(parent: animationController, curve: Curves.easeOut),
+        axisAlignment: 0.0,
+        // 리스트뷰에 추가될 컨테이너 위젯
+        child: Container(
+          margin: const EdgeInsets.symmetric(vertical: 10.0),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Container(
+                margin: const EdgeInsets.only(right: 16.0),
+                // 사용자명의 첫번째 글자를 서클 아바타로 표시
+                child: CircleAvatar(child: Text(header.userName[0])),
               ),
-            )
-          ],
+              Expanded(
+                // 컬럼 추가
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    // 사용자명을 subhead 테마로 출력
+                    Text(header.userName,
+                        style: Theme.of(context).textTheme.subtitle1),
+                    // 입력받은 메시지 출력
+                    Container(
+                      margin: const EdgeInsets.only(top: 5.0),
+                      child: Text(text),
+                    ),
+                  ],
+                ),
+              )
+            ],
+          ),
         ),
       ),
     );

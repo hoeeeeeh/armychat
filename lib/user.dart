@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'setting.dart' as setting;
-import 'counselor.dart' as counselor;
-import 'chatbot.dart' as bot;
+import 'community.dart' as community;
+//import 'chatbot.dart' as bot;
 import 'home.dart' as home;
+import 'chatList.dart' as chatList;
+import 'friend.dart' as friend;
+import 'counselor.dart' as counselor;
+import 'package:flutter_icons/flutter_icons.dart';
 
 class Userinfo extends StatefulWidget {
   // Userinfo({Key key, this.title}) : super(key: key);
@@ -24,7 +28,7 @@ class Userinfo extends StatefulWidget {
 }
 
 class _UserinfoState extends State<Userinfo> {
-  int _selectedIndex = 0;
+  int _selectedIndex = 2;
 
   final String userName;
   final String email;
@@ -33,9 +37,11 @@ class _UserinfoState extends State<Userinfo> {
 
   _UserinfoState(this.userName, this.email, this.id) {
     _widgetArray = <Widget>[
+      friend.friendList(),
+      community.Community(),
       home.Homepage(id, userName, email),
       counselor.CounSel(id),
-      bot.ChatScreen(),
+      chatList.ChatList(),
       setting.Setting(),
     ];
   }
@@ -60,19 +66,38 @@ class _UserinfoState extends State<Userinfo> {
       bottomNavigationBar: BottomNavigationBar(
         items: <BottomNavigationBarItem>[
           BottomNavigationBarItem(
+            backgroundColor: Colors.pinkAccent[100],
+            icon: Icon(Icons.people_rounded),
+            label: '상담친구',
+          ),
+          BottomNavigationBarItem(
+            backgroundColor: Colors.lightBlueAccent[400],
+            icon: Icon(Icons.house_siding),
+            label: '개인상담소',
+          ),
+          BottomNavigationBarItem(
             backgroundColor: Colors.green,
-            icon: Icon(Icons.home),
+            icon: Icon(Icons.home_filled),
             label: '홈',
           ),
           BottomNavigationBarItem(
-            backgroundColor: Colors.red,
-            icon: Icon(Icons.chat_bubble),
+            backgroundColor: Colors.blueAccent[100],
+            icon: Icon(AntDesign.smile_circle),
             label: '상담관과 상담하기',
           ),
+
+          /*
+          
           BottomNavigationBarItem(
             backgroundColor: Colors.blue,
             icon: Icon(Icons.chat_sharp),
-            label: '챗봇과 상담하기',
+            label: '실시간 상담',
+          ),
+          */
+          BottomNavigationBarItem(
+            backgroundColor: Colors.redAccent[100],
+            icon: Icon(AntDesign.message1),
+            label: '채팅',
           ),
           BottomNavigationBarItem(
             backgroundColor: Colors.grey,
@@ -81,7 +106,7 @@ class _UserinfoState extends State<Userinfo> {
           ),
         ],
         currentIndex: _selectedIndex,
-        selectedItemColor: Colors.amber[400],
+        selectedItemColor: Colors.yellowAccent[100],
         onTap: _onItemTapped,
       ),
     );
