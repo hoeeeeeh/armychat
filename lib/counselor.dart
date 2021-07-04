@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_signin_button/button_list.dart';
 
 class CounSel extends StatefulWidget {
   //CounSel({Key key, this.title}) : super(key: key);
@@ -154,117 +155,38 @@ class _CounSelState extends State<CounSel> {
             children: <Widget>[
               Container(
                 padding: EdgeInsets.fromLTRB(20, 0, 20, 10),
-                child: Text('상담'),
+                child: Text(
+                  '법률 및 인권 상담 신청',
+                  style: TextStyle(fontSize: 22),
+                ),
               ),
-              TextFormField(
-                  textAlign: TextAlign.center,
-                  controller: titleController,
-                  keyboardType: TextInputType.text,
-                  maxLength: 20,
-                  //maxLines: 50,
-                  decoration: InputDecoration(
-                      hintText: '상담 제목을 입력해주세요',
-                      // suffixIcon: IconButton(
-                      //   onPressed: () =>
-                      //       idController.clear(),
-                      //   icon: Icon(Icons.clear),
-                      // ),
-                      border: OutlineInputBorder())),
-              Padding(padding: EdgeInsets.only(bottom: 20)),
-              Padding(
-                padding: EdgeInsets.all(10),
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 10, vertical: 15),
+                decoration: BoxDecoration(border: Border.all(width: 1)),
+                child: Text(
+                    ' 육군 법률 및 인권 상담 앱 "아미챗"에 등록된 상담사와의 개인 상담을 위한 페이지입니다. '
+                    '익명 상담을 체크하실 경우 상담원에게 개인 정보가 드러나지 않습니다. '
+                    '상담원에 대한 모욕적인 언행이나 욕설 등의 행위는 관련 법규에 의거 고발될 수 있음을 알려드립니다. '
+                    '\n\n 익명 상담을 원하실 경우 반드시 "익명으로 상담하기"를 꼭 체크해주시기 바랍니다. ',
+                    style: TextStyle(fontSize: 14.5)),
               ),
-              SizedBox(
-                height: 450,
-                child: Column(children: <Widget>[
-                  Container(
-                      height: 400,
-                      width: 400,
-                      decoration: BoxDecoration(border: Border.all(width: 1)),
-                      child: Container(
-                          height: 450,
-                          child: SingleChildScrollView(
-                            child: Center(
-                                child: TextFormField(
-                                    // id 입력
-
-                                    textAlign: TextAlign.center,
-                                    controller: textController,
-                                    keyboardType: TextInputType.text,
-                                    //maxLength: 1000,
-                                    maxLines: 50,
-                                    decoration: InputDecoration(
-                                      hintText: '상담내용을 입력해주세요',
-                                      // suffixIcon: IconButton(
-                                      //   onPressed: () =>
-                                      //       idController.clear(),
-                                      //   icon: Icon(Icons.clear),
-                                      // ),
-                                      //border: OutlineInputBorder()
-                                    ))),
-                          ))),
-                  Container(
-                    height: 50,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: <Widget>[
-                        Text('약관에 동의하십니까?'),
-                        Checkbox(
-                          value: checked,
-                          onChanged: _isChecked,
-                        )
-                      ],
-                    ),
-                  )
-                ]),
+              Container(
+                padding: EdgeInsets.symmetric(vertical: 10),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Text('위 내용을 확인하셨습니까?'),
+                    Checkbox(
+                      value: checked,
+                      onChanged: _isChecked,
+                    )
+                  ],
+                ),
               ),
-              Padding(
-                padding: EdgeInsets.all(10),
-              ),
-              TextFormField(
-                // 이메일주소 입력
-                inputFormatters: [
-                  FilteringTextInputFormatter(RegExp('[a-z,0-9,.,@,_]'),
-                      allow: true),
-                ],
-                controller: emailController,
-                maxLength: 30,
-                keyboardType: TextInputType.emailAddress,
-                decoration: InputDecoration(
-                    hintText: '답변을 받을 이메일을 입력해주세요',
-                    suffixIcon: IconButton(
-                      onPressed: () {
-                        emailController.clear();
-                        wantClear = true;
-                      },
-                      icon: Icon(Icons.clear),
-                    ),
-                    border: OutlineInputBorder()),
-                onTap: () {
-                  if (!wantClear) {
-                    emailController.text = _email;
-                  }
-                  wantClear = false;
-                },
-              ),
-
-              Padding(
-                padding: EdgeInsets.all(3),
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text('익명으로 상담하기'),
-                  Center(
-                      child: Checkbox(
-                    onChanged: setAnonymous,
-                    value: anonyCheck,
-                  )),
-                ],
-              ),
-
-              Padding(
-                padding: EdgeInsets.all(10),
+              Divider(
+                height: 80,
+                color: Colors.black,
+                thickness: 0.5,
               ),
 
               TextFormField(
@@ -351,20 +273,114 @@ class _CounSelState extends State<CounSel> {
                   wantClear = false;
                 },
               ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text('익명으로 상담하기'),
+                  Center(
+                      child: Checkbox(
+                    onChanged: setAnonymous,
+                    value: anonyCheck,
+                  )),
+                ],
+              ),
+              Divider(
+                height: 80,
+                color: Colors.black,
+                thickness: 0.5,
+              ),
+              Container(
+                padding: EdgeInsets.symmetric(vertical: 15),
+                child: Center(
+                    child: Text(
+                  '상담 정보 입력',
+                  style: TextStyle(fontSize: 22),
+                )),
+              ),
+              TextFormField(
+                  controller: titleController,
+                  keyboardType: TextInputType.text,
+                  maxLength: 20,
+                  //maxLines: 50,
+                  decoration: InputDecoration(
+                      hintText: '상담 제목을 입력해주세요',
+                      suffixIcon: IconButton(
+                        onPressed: () => titleController.clear(),
+                        icon: Icon(Icons.clear),
+                      ),
+                      border: OutlineInputBorder())),
               Padding(
-                padding: EdgeInsets.only(bottom: 10),
+                padding: EdgeInsets.symmetric(vertical: 3),
               ),
-              Text(
-                '익명으로 상담해도 로그 기록은 남으니,\n상담관님께 폭언,욕설은 자제해주시길 바랍니다.',
-                textAlign: TextAlign.center,
-              ),
-              Padding(
-                padding: EdgeInsets.only(bottom: 10),
-              ),
+              SizedBox(
+                height: 450,
+                child: Column(children: <Widget>[
+                  Container(
+                      height: 400,
+                      width: 400,
+                      decoration: BoxDecoration(border: Border.all(width: 1)),
+                      child: Container(
+                          height: 450,
+                          child: SingleChildScrollView(
+                            child: Center(
+                                child: TextFormField(
+                                    // id 입력
 
+                                    textAlign: TextAlign.center,
+                                    controller: textController,
+                                    keyboardType: TextInputType.text,
+                                    //maxLength: 1000,
+                                    maxLines: 50,
+                                    decoration: InputDecoration(
+                                      hintText: '상담내용을 입력해주세요',
+                                      // suffixIcon: IconButton(
+                                      //   onPressed: () =>
+                                      //       idController.clear(),
+                                      //   icon: Icon(Icons.clear),
+                                      // ),
+                                      //border: OutlineInputBorder()
+                                    ))),
+                          ))),
+                ]),
+              ),
+              Padding(
+                padding: EdgeInsets.symmetric(vertical: 3),
+              ),
+              TextFormField(
+                // 이메일주소 입력
+                inputFormatters: [
+                  FilteringTextInputFormatter(RegExp('[a-z,0-9,.,@,_]'),
+                      allow: true),
+                ],
+                controller: emailController,
+                maxLength: 30,
+                keyboardType: TextInputType.emailAddress,
+                decoration: InputDecoration(
+                    hintText: '답변을 받을 이메일을 입력해주세요',
+                    suffixIcon: IconButton(
+                      onPressed: () {
+                        emailController.clear();
+                        wantClear = true;
+                      },
+                      icon: Icon(Icons.clear),
+                    ),
+                    border: OutlineInputBorder()),
+                onTap: () {
+                  if (!wantClear) {
+                    emailController.text = _email;
+                  }
+                  wantClear = false;
+                },
+              ),
+              Padding(
+                padding: EdgeInsets.symmetric(vertical: 3),
+              ),
               Center(
                 child: ElevatedButton(
-                    child: Text("접수하기"),
+                    child: Text("신청하기"),
+                    style: ButtonStyle(
+                        backgroundColor:
+                            MaterialStateProperty.all(Colors.white)),
                     onPressed: () => {
                           _submit(
                               titleController.text,

@@ -236,97 +236,101 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
           FocusScope.of(context).unfocus();
         },
         child: SafeArea(
-            child: Column(
-          children: [
-            StreamBuilder<DocumentSnapshot>(
-                stream: firebaseStream,
-                builder: (context, snapshot) {
-                  //print('streamBuilder builder');
-                  //print(snapshot);
-                  //
-                  //print(snapshot.hasData);
-                  print('snapshot off');
-                  if (snapshot.hasData) {
-                    print('snapshot on');
-                    FirebaseFirestore.instance
-                        .collection('chat')
-                        .doc('$chatUrl')
-                        .get()
-                        .then((DocumentSnapshot ds) {
-                      //whatSaid = ds.data()['whatSaid'] ?? [];
+            child: SingleChildScrollView(
+          child: Column(
+            children: [
+              StreamBuilder<DocumentSnapshot>(
+                  stream: firebaseStream,
+                  builder: (context, snapshot) {
+                    //print('streamBuilder builder');
+                    //print(snapshot);
+                    //
+                    //print(snapshot.hasData);
+                    print('snapshot off');
+                    if (snapshot.hasData) {
+                      print('snapshot on');
+                      FirebaseFirestore.instance
+                          .collection('chat')
+                          .doc('$chatUrl')
+                          .get()
+                          .then((DocumentSnapshot ds) {
+                        //whatSaid = ds.data()['whatSaid'] ?? [];
 
-                      if (ds != null && ds.data() != null) {
-                        print('aaaaa');
-                        print(ds.data());
-                        print('bbbbb');
-                        print(ds.data()['whatSaid']);
-                        whatSaid = ds.data()['whatSaid'] ?? [];
-                        for (var i = lastReadIndex; i < whatSaid.length; i++) {
-                          _insertSingleItem(ChatMessage(
-                            text: whatSaid[i] ?? '그런거 없쪙',
-                            animationController: AnimationController(
-                              duration: Duration(milliseconds: 700),
-                              vsync: this,
-                            ),
-                          ));
+                        if (ds != null && ds.data() != null) {
+                          print('aaaaa');
+                          print(ds.data());
+                          print('bbbbb');
+                          print(ds.data()['whatSaid']);
+                          whatSaid = ds.data()['whatSaid'] ?? [];
+                          for (var i = lastReadIndex;
+                              i < whatSaid.length;
+                              i++) {
+                            _insertSingleItem(ChatMessage(
+                              text: whatSaid[i] ?? '그런거 없쪙',
+                              animationController: AnimationController(
+                                duration: Duration(milliseconds: 700),
+                                vsync: this,
+                              ),
+                            ));
+                          }
+                          //print(whatSaid);
+                          lastReadIndex = (whatSaid.length);
+                          //print(whatSaid.length - 1);
                         }
-                        //print(whatSaid);
-                        lastReadIndex = (whatSaid.length);
-                        //print(whatSaid.length - 1);
-                      }
-                      //return Future<String>
-                    });
-                  }
+                        //return Future<String>
+                      });
+                    }
 
-                  //print('out of streamBuilder');
-                  return SizedBox(
-                    height: (height * 0.90) -
-                        (_safeAreaHeightBottom + _safeAreaHeight) -
-                        MediaQuery.of(context).viewInsets.bottom, // 키보드 올라오면
+                    //print('out of streamBuilder');
+                    return SizedBox(
+                      height: (height * 0.90) -
+                          (_safeAreaHeightBottom + _safeAreaHeight) -
+                          MediaQuery.of(context).viewInsets.bottom, // 키보드 올라오면
 
-                    child: AnimatedList(
-                      controller: _scrollController,
-                      shrinkWrap: true,
-                      reverse: true,
-                      key: _listKey,
-                      itemBuilder: (BuildContext context, int index,
-                          Animation<double> animation) {
-                        //print('buildItem');
-                        return _buildItem(_message[index], animation, index);
-                      },
+                      child: AnimatedList(
+                        controller: _scrollController,
+                        shrinkWrap: true,
+                        reverse: true,
+                        key: _listKey,
+                        itemBuilder: (BuildContext context, int index,
+                            Animation<double> animation) {
+                          //print('buildItem');
+                          return _buildItem(_message[index], animation, index);
+                        },
+                      ),
+                    );
+                  }),
+              Align(
+                alignment: Alignment.bottomCenter,
+                child: SizedBox(
+                  height: height * 0.05,
+                  //height: 50,
+                  child: TextField(
+                    //autofocus: true,
+                    decoration: InputDecoration(
+                      icon: Icon(
+                        Icons.message,
+                        color: Colors.greenAccent,
+                      ),
+                      hintText: "채팅을 입력해주세요.",
                     ),
-                  );
-                }),
-            Align(
-              alignment: Alignment.bottomCenter,
-              child: SizedBox(
-                height: height * 0.05,
-                //height: 50,
-                child: TextField(
-                  //autofocus: true,
-                  decoration: InputDecoration(
-                    icon: Icon(
-                      Icons.message,
-                      color: Colors.greenAccent,
-                    ),
-                    hintText: "채팅을 입력해주세요.",
+                    controller: _queryController,
+                    textInputAction: TextInputAction.send,
+                    onSubmitted: (msg) {
+                      _queryController.text =
+                          '<$curUserId>' + _queryController.text;
+                      whatSaid.add(_queryController.text);
+                      _queryController.clear();
+                      FirebaseFirestore.instance
+                          .collection('chat')
+                          .doc('$chatUrl')
+                          .update({"whatSaid": whatSaid});
+                    },
                   ),
-                  controller: _queryController,
-                  textInputAction: TextInputAction.send,
-                  onSubmitted: (msg) {
-                    _queryController.text =
-                        '<$curUserId>' + _queryController.text;
-                    whatSaid.add(_queryController.text);
-                    _queryController.clear();
-                    FirebaseFirestore.instance
-                        .collection('chat')
-                        .doc('$chatUrl')
-                        .update({"whatSaid": whatSaid});
-                  },
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         )),
       ),
     );

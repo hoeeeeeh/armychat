@@ -1,5 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'dart:async';
 import 'header.dart' as header;
 
@@ -44,7 +46,12 @@ class _SettingState extends State<Setting> {
           context: context,
           tiles: [
             ListTile(
-                title: Text('개인 상담소 열기'),
+                title: Text('프로필'),
+                onTap: () => Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => Profile())),
+                leading: Icon(Icons.person)),
+            ListTile(
+                title: Text('개인 상담소 개설 신청'),
                 onTap: () => Navigator.push(context,
                     MaterialPageRoute(builder: (context) => IndiCounsel())),
                 leading: Icon(Icons.meeting_room)),
@@ -63,7 +70,6 @@ class _SettingState extends State<Setting> {
                   //await header._auth.signOut();
                 },
                 leading: Icon(Icons.exit_to_app)),
-          
 
             ListTile(
               title: Text(
@@ -127,7 +133,7 @@ class _MakingNotesState extends State<MakingNotes> {
   Timer _timer;
 
   bool _visible = true;
-  String text = '개발자 : 병장 유호균, 일병 김영길 등 소프트웨어 동아리 Sudo \n 기획 : 일병 나건우';
+  String text = '개발자 : 상병 김영길 병장 노경민 등 \n 소프트웨어 동아리 Sudo \n';
 
   @override
   void initState() {
@@ -185,18 +191,304 @@ class IndiCounsel extends StatefulWidget {
 }
 
 class _IndiCounselState extends State<IndiCounsel> {
+  final _nameController = TextEditingController();
+  final _locationController = TextEditingController();
+  final _fieldController = TextEditingController();
+  final _ageController = TextEditingController();
+  final _introduceController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(
-          child: Center(
-              child: Text(
-        '개인 상담소 정보 입력',
-        textAlign: TextAlign.center,
-      ))),
+      body: SingleChildScrollView(
+        child: SafeArea(
+            child: Container(
+          constraints: BoxConstraints(
+            maxWidth: MediaQuery.of(context).size.width,
+          ),
+          child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 10),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Container(
+                    child: Column(children: [
+                      Text('개인 상담소 개설 신청',
+                          style: TextStyle(
+                              fontSize: 24, fontWeight: FontWeight.bold)),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      Text('관리자 승인 이후 개설이 완료됩니다'),
+                    ]),
+                  ),
+                  SizedBox(
+                    height: 30.0,
+                  ),
+                  TextField(
+                    controller: _nameController,
+                    maxLength: 20,
+                    decoration: InputDecoration(
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8.0),
+                          borderSide: BorderSide.none,
+                        ),
+                        suffixIcon: IconButton(
+                          splashColor: Colors.transparent,
+                          onPressed: () => _nameController.clear(),
+                          icon: Icon(Icons.clear),
+                        ),
+                        filled: true,
+                        fillColor: Color(0xFFe7edeb),
+                        hintText: "상담소 이름",
+                        prefixIcon: Icon(
+                          Icons.perm_contact_cal,
+                          color: Colors.grey,
+                        )),
+                  ),
+                  SizedBox(
+                    height: 5.0,
+                  ),
+                  TextField(
+                    controller: _locationController,
+                    decoration: InputDecoration(
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8.0),
+                          borderSide: BorderSide.none,
+                        ),
+                        suffixIcon: IconButton(
+                          splashColor: Colors.transparent,
+                          onPressed: () => _locationController.clear(),
+                          icon: Icon(Icons.clear),
+                        ),
+                        filled: true,
+                        fillColor: Color(0xFFe7edeb),
+                        hintText: "지역",
+                        prefixIcon: Icon(
+                          Icons.location_on,
+                          color: Colors.grey,
+                        )),
+                  ),
+                  SizedBox(
+                    height: 20.0,
+                  ),
+                  TextField(
+                    controller: _ageController,
+                    inputFormatters: [
+                      FilteringTextInputFormatter(RegExp('[0-9]'), allow: true),
+                    ],
+                    onChanged: null,
+                    keyboardType: TextInputType.numberWithOptions(),
+                    decoration: InputDecoration(
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8.0),
+                          borderSide: BorderSide.none,
+                        ),
+                        suffixIcon: IconButton(
+                          splashColor: Colors.transparent,
+                          onPressed: () => _ageController.clear(),
+                          icon: Icon(Icons.clear),
+                        ),
+                        filled: true,
+                        fillColor: Color(0xFFe7edeb),
+                        hintText: "나이",
+                        prefixIcon: Icon(
+                          Icons.schedule,
+                          color: Colors.grey,
+                        )),
+                  ),
+                  SizedBox(
+                    height: 20.0,
+                  ),
+                  TextField(
+                    controller: _fieldController,
+                    decoration: InputDecoration(
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8.0),
+                          borderSide: BorderSide.none,
+                        ),
+                        suffixIcon: IconButton(
+                          splashColor: Colors.transparent,
+                          onPressed: () => _fieldController.clear(),
+                          icon: Icon(Icons.clear),
+                        ),
+                        filled: true,
+                        fillColor: Color(0xFFe7edeb),
+                        hintText: "자신있는 분야",
+                        prefixIcon: Icon(
+                          Icons.cloud_queue,
+                          color: Colors.grey,
+                        )),
+                  ),
+                  SizedBox(
+                    height: 20.0,
+                  ),
+                  TextField(
+                    controller: _introduceController,
+                    maxLength: 50,
+                    decoration: InputDecoration(
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8.0),
+                          borderSide: BorderSide.none,
+                        ),
+                        suffixIcon: IconButton(
+                          splashColor: Colors.transparent,
+                          onPressed: () => _introduceController.clear(),
+                          icon: Icon(Icons.clear),
+                        ),
+                        filled: true,
+                        fillColor: Color(0xFFe7edeb),
+                        hintText: "간단한 소개",
+                        prefixIcon: Icon(
+                          Icons.article,
+                          color: Colors.grey,
+                        )),
+                  ),
+                  SizedBox(
+                    height: 40.0,
+                  ),
+                  Container(
+                      width: 300,
+                      height: 50,
+                      margin: EdgeInsets.symmetric(horizontal: 50),
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(100)),
+                      child: ElevatedButton(
+                          onPressed: () {},
+                          child: Text("신청하기",
+                              style:
+                                  TextStyle(color: Colors.white, fontSize: 17)),
+                          style: ElevatedButton.styleFrom(
+                              primary: Colors.black,
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(30))))),
+                ],
+              )),
+        )),
+      ),
     );
   }
 }
+
+class Profile extends StatefulWidget {
+  @override
+  _ProfileState createState() => _ProfileState();
+}
+
+class _ProfileState extends State<Profile> {
+  final String _userId = header.userId; //사용자 계정
+  final String _userName = header.userName; //사용자 이름
+  final String _userSerialNumber = header.userArmyNum; //사용자 군번
+  final String _userEmail = header.userEmail; //이메일
+  Widget _createCustomListTile(String leadingTxt, String titleTxt) {
+    return ListTile(
+      leading: Text(
+        leadingTxt,
+        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+      ),
+      trailing: Text(
+        titleTxt,
+        style: TextStyle(fontSize: 18),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: SingleChildScrollView(
+        child: SafeArea(
+          child: Container(
+            constraints: BoxConstraints(
+              maxWidth: MediaQuery.of(context).size.width,
+            ),
+            child: Padding(
+              padding:
+                  const EdgeInsets.symmetric(vertical: 50, horizontal: 20.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Stack(children: [
+                    ClipOval(
+                      child: Material(
+                        child: Ink.image(
+                          image: NetworkImage(
+                              'https://cdn.business2community.com/wp-content/uploads/2017/08/blank-profile-picture-973460_640.png'),
+                          fit: BoxFit.cover,
+                          width: 128,
+                          height: 128,
+                          child: InkWell(onTap: () {}),
+                        ),
+                      ),
+                    ),
+                    Positioned(
+                        bottom: 0,
+                        right: 4,
+                        child: ClipOval(
+                            child: Container(
+                                padding: EdgeInsets.all(3),
+                                color: Colors.white,
+                                child: ClipOval(
+                                    child: Container(
+                                        color: Colors.red,
+                                        padding: EdgeInsets.all(8),
+                                        child: Icon(
+                                          Icons.edit,
+                                          size: 20,
+                                          color: Colors.white,
+                                        ))))))
+                  ]),
+                  SizedBox(height: 30),
+                  Divider(),
+                  _createCustomListTile('계정', '$_userId'),
+                  Divider(),
+                  _createCustomListTile('이름', '$_userName'),
+                  Divider(),
+                  _createCustomListTile('군번', '$_userSerialNumber'),
+                  Divider(),
+                  _createCustomListTile('이메일', '$_userEmail'),
+                  Divider(),
+
+                  /*
+                  firestore.collection('member').doc(idController.text).set({
+                    'id': idController.text,
+                    'passwd': passwdController.text,
+                    'email': emailController.text,
+                    'armyNum': armyNumController.text,
+                    'phoneNum': phoneController.text,
+                    'name': nameController.text,
+                    'counselCount': 0,
+                    'chatList': [],
+                  }
+                  */
+                  SizedBox(height: 30),
+                  Container(
+                      width: 300,
+                      height: 50,
+                      margin: EdgeInsets.symmetric(horizontal: 50),
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(100)),
+                      child: ElevatedButton(
+                          onPressed: () {},
+                          child: Text("정보수정",
+                              style:
+                                  TextStyle(color: Colors.white, fontSize: 17)),
+                          style: ElevatedButton.styleFrom(
+                              primary: Colors.black,
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(30))))),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 
 //   _timer2 = Timer.periodic(Duration(seconds: 10), (timer) {
 //     setState(() {

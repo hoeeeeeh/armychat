@@ -124,7 +124,7 @@ class _MyHomePageState extends State<MyHomePage> {
       print(pw);
 
       /* 테스트용!! */
-      
+
       //id = 'admin';
       //pw = 'admin';
 
@@ -137,6 +137,7 @@ class _MyHomePageState extends State<MyHomePage> {
           header.userEmail = user['email'];
           header.userName = user['name'];
           header.userId = user['id'];
+
           Navigator.push(
               context,
               MaterialPageRoute(
@@ -157,13 +158,32 @@ class _MyHomePageState extends State<MyHomePage> {
         // resizeToAvoidBottomPadding: false,
         body: Center(
       child: Container(
-        padding: EdgeInsets.fromLTRB(20, 20, 20, 20),
+        padding: EdgeInsets.fromLTRB(20, 30, 20, 20),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
+            Center(
+              child: Text('3'),
+            ),
             Container(
+              constraints: BoxConstraints(
+                maxHeight: MediaQuery.of(context).size.height,
+                maxWidth: MediaQuery.of(context).size.width,
+              ),
               padding: EdgeInsets.fromLTRB(20, 20, 20, 20),
-              child: Text('육군 인권 상담소, "아미챗" '),
+              child: RichText(
+                text: TextSpan(
+                  style: TextStyle(color: Colors.black),
+                  children: <TextSpan>[
+                    TextSpan(
+                        text: '육군 법률&인권 상담소, ', style: TextStyle(fontSize: 21)),
+                    TextSpan(
+                        text: '아미챗',
+                        style: TextStyle(
+                            fontSize: 23, fontWeight: FontWeight.bold)),
+                  ],
+                ),
+              ),
             ),
             TextFormField(
                 inputFormatters: [
@@ -173,6 +193,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 keyboardType: TextInputType.emailAddress,
                 decoration: InputDecoration(
                     hintText: '아이디를 입력해주세요',
+                    prefixIcon: Icon(Icons.person),
                     suffixIcon: IconButton(
                       onPressed: () => idController.clear(),
                       icon: Icon(Icons.clear),
@@ -187,6 +208,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 obscureText: true,
                 decoration: InputDecoration(
                     hintText: '비밀번호를 입력해주세요',
+                    prefixIcon: Icon(Icons.lock),
                     suffixIcon: IconButton(
                       onPressed: () => idController.clear(),
                       icon: Icon(Icons.clear),
