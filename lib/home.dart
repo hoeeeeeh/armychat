@@ -132,24 +132,17 @@ class _HomepageState extends State<Homepage> {
                 Padding(
                   padding: EdgeInsets.only(bottom: 20),
                 ),
+                Divider(),
                 Center(child: Text(userName + '님(' + email + ') 어서오세요.')),
+                Divider(),
                 Padding(padding: EdgeInsets.only(bottom: 20)),
-                Container(
-                  constraints: BoxConstraints(
-                    maxHeight: MediaQuery.of(context).size.height,
-                    maxWidth: MediaQuery.of(context).size.width,
-                  ),
-                  padding: EdgeInsets.only(top: 20.0),
-                  child: Text('내 상담 확인하기'),
-                  decoration: BoxDecoration(
-                      border: Border(
-                          bottom: BorderSide(
-                    color: Colors.black,
-                    width: 2.0,
-                  ))),
-                ),
                 TableCalendar(
                   calendarController: _calendarController,
+                ),
+                Divider(),
+                Container(
+                  padding: EdgeInsets.only(top: 20.0),
+                  child: Text('내 상담 일정', style: TextStyle(fontSize: 16)),
                 ),
                 SizedBox(
                   height: 600,

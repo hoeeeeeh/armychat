@@ -216,8 +216,9 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: PreferredSize(
-        preferredSize: Size.fromHeight(height * 0.05),
+        preferredSize: Size.fromHeight(height * 0.06),
         child: AppBar(
+          backgroundColor: Colors.amberAccent,
           //backgroundColor: Colors.white,
           leading: new IconButton(
             icon: new Icon(Icons.arrow_back, size: 30),
@@ -303,17 +304,23 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
               Align(
                 alignment: Alignment.bottomCenter,
                 child: SizedBox(
-                  height: height * 0.05,
+                  height: height * 0.08,
                   //height: 50,
                   child: TextField(
                     //autofocus: true,
                     decoration: InputDecoration(
-                      icon: Icon(
+                      prefixIcon: Icon(
                         Icons.message,
-                        color: Colors.greenAccent,
+                        color: Colors.grey,
                       ),
                       hintText: "채팅을 입력해주세요.",
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(0),
+                      ),
+                      filled: true,
+                      fillColor: Color(0xFFe7edeb),
                     ),
+
                     controller: _queryController,
                     textInputAction: TextInputAction.send,
                     onSubmitted: (msg) {

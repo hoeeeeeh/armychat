@@ -21,33 +21,37 @@ class _friendListState extends State<friendList> {
   ];
 
   @override
-  void _popupMenu([String text]) {
+  void _popupMenu(List<String> text) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         // return object of type Dialogs
         return AlertDialog(
-          title: new Text("프로필"),
+          title: new Center(
+              child: Text(
+            text[0],
+            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          )),
           content: new SingleChildScrollView(
               child: Column(
             children: [
               ListTile(
                 title: Text(
-                  '전문 분야 : ',
+                  '자신있는 분야 - ' + text[1],
                   textAlign: TextAlign.left,
                 ),
                 onTap: () {},
               ),
               ListTile(
                 title: Text(
-                  '도움을 준 전우 : ', // 도움을 준 전우 처리
+                  '도움받은 전우 - ' + text[2] + '명', // 도움을 준 전우 처리
                   textAlign: TextAlign.left,
                 ),
                 onTap: () {},
               ),
               ListTile(
                 title: Text(
-                  '도움을 받은 전우의 만족도 : ', // 평가 유지
+                  '평가 - ' + text[3] + '/5.0', // 평가 유지
                   textAlign: TextAlign.left,
                 ),
                 onTap: () {},
@@ -112,18 +116,28 @@ class _friendListState extends State<friendList> {
                 offset: Offset(0, 3))
           ],
         ),
-        child: ListTile( // 롱 프레스 
+        child: ListTile(
+          // 롱 프레스
           //tileColor: Colors.yellowAccent[100],
           selectedTileColor: Colors.amber[200],
           //hoverColor: Colors.blueAccent[400],
           shape: RoundedRectangleBorder(),
-          title: Text(
-            document.data()['name'],
-            textAlign: TextAlign.left,
-            style: TextStyle(fontFamily: 'BMHANNAAir'),
+          title: Center(
+            child: Text(
+              document.data()['name'],
+              style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  fontFamily: 'BMHANNAAir'),
+            ),
           ),
           onTap: () {
-            _popupMenu('long press');
+            _popupMenu([
+              document.data()['name'],
+              'field',
+              'helped',
+              'score'
+            ]); //각 사용자들 정보 파이어베이스로 입력부탁
             ;
           },
         ),

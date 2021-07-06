@@ -17,27 +17,31 @@ class _ChatListState extends State<ChatList> {
       builder: (BuildContext context) {
         // return object of type Dialogs
         return AlertDialog(
-          title: new Text("메뉴"),
+          title: Center(
+              child: new Text(
+            text,
+            style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+          )),
           content: new SingleChildScrollView(
               child: Column(
             children: [
               ListTile(
                 title: Text(
-                  '친구 삭제',
+                  '삭제',
                   textAlign: TextAlign.center,
                 ),
                 onTap: () {},
               ),
               ListTile(
                 title: Text(
-                  '친구 1',
+                  '차단',
                   textAlign: TextAlign.center,
                 ),
                 onTap: () {},
               ),
               ListTile(
                 title: Text(
-                  '친구 2',
+                  '수신 거부',
                   textAlign: TextAlign.center,
                 ),
                 onTap: () {},
@@ -98,7 +102,7 @@ class _ChatListState extends State<ChatList> {
         );
       },
       onLongPress: () {
-        _popupMenu('long press');
+        _popupMenu(document.data()['name']);
       },
     );
   }
