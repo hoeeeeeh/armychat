@@ -27,6 +27,10 @@ String userEmail = "";
 String userArmyNum = "";
 String userId = 'id';
 String phoneNum = '010-1234-5678';
+List friendList = [];
+List chatList = [];
+
+String indiCouncel = 'individualCouncel';
 
 final FirebaseAuth _auth = FirebaseAuth.instance;
 

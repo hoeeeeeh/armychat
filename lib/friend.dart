@@ -26,21 +26,21 @@ class _friendListState extends State<friendList> {
             children: [
               ListTile(
                 title: Text(
-                  '자신있는 분야 - ' + text[1],
+                  '이메일 - ' + text[1],
                   textAlign: TextAlign.left,
                 ),
                 onTap: () {},
               ),
               ListTile(
                 title: Text(
-                  '도움받은 전우 - ' + text[2] + '명', // 도움을 준 전우 처리
+                  '휴대폰 번호 - ' + text[2], // 평가 유지
                   textAlign: TextAlign.left,
                 ),
                 onTap: () {},
               ),
               ListTile(
                 title: Text(
-                  '평가 - ' + text[3] + '/5.0', // 평가 유지
+                  '상담횟수 - ' + text[3] + '명', // 도움을 준 전우 처리
                   textAlign: TextAlign.left,
                 ),
                 onTap: () {},
@@ -114,10 +114,10 @@ class _friendListState extends State<friendList> {
           ),
           onTap: () {
             _popupMenu([
-              document.data()['name'],
-              'd', //자신의 분야
+              document.data()['name'], //이름
+              document.data()['email'], //이메일
+              document.data()['phoneNum'], //폰번
               document.data()['chatList'].length.toString() ?? 0, //도움준사람(채팅개수)
-              'score' //평가 점수
             ]);
           },
         ),

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'const.dart';
 import 'chatBoth.dart' as chat;
+import 'header.dart' as header;
 
 class ChatList extends StatefulWidget {
   @override
@@ -75,8 +76,10 @@ class _ChatListState extends State<ChatList> {
           } else {
             return ListView.builder(
               padding: EdgeInsets.all(10.0),
-              itemBuilder: (context, index) =>
-                  buildItem(context, snapshot.data.documents[index]),
+              itemBuilder: (context, index) {
+                var item = snapshot.data.documents[index];
+                return buildItem(context, item);
+              },
               itemCount: snapshot.data.documents.length,
             );
           }

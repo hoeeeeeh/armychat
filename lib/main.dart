@@ -132,12 +132,12 @@ class _MyHomePageState extends State<MyHomePage> {
       if (snapShot.exists) {
         var user = snapShot.data();
         if (user['passwd'] == pw) {
-          print('ggg');
           header.userArmyNum = user['armyNum'];
           header.userEmail = user['email'];
           header.userName = user['name'];
           header.userId = user['id'];
           header.phoneNum = user['phoneNum'];
+          header.chatList = user['chatList'];
 
           Navigator.push(
               context,

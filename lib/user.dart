@@ -94,11 +94,13 @@ class _UserinfoState extends State<Userinfo> {
             label: '실시간 상담',
           ),
           */
+          /*
           BottomNavigationBarItem(
             backgroundColor: Colors.redAccent[100],
             icon: Icon(AntDesign.message1),
             label: '채팅',
           ),
+          */
           BottomNavigationBarItem(
             backgroundColor: Colors.grey,
             icon: Icon(Icons.settings),

@@ -55,8 +55,8 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
     whatSaid = [];
     getSafeAreaHeight();
 
-    curUserId = header.userArmyNum.hashCode;
-    oppoUserId = document.data()['armyNum'].hashCode;
+    curUserId = header.userId.hashCode;
+    oppoUserId = document.data()['id'].hashCode;
 
     print('curUserId = ' + '$curUserId');
     print('oppoUserId = ' + '$oppoUserId');
@@ -118,14 +118,12 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
   }
 
   void isAlreadyExist(chatURL) async {
-    print(3);
-
     await FirebaseFirestore.instance
         .collection('member')
         .doc(header.userId)
         .get()
         .then((DocumentSnapshot ds) {
-      curChatList.add(ds.data()['chatList']);
+      curChatList = ds.data()['chatList'];
       if (!curChatList.contains(chatURL)) curChatList.add(chatURL);
       FirebaseFirestore.instance
           .collection('member')
@@ -176,21 +174,44 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
     });
   }
 */
-  void _alert([String text]) {
+
+  void _addFriend() {
+    var flist = header.friendList ?? [];
+    flist.add(document.data()['id']);
+
+    FirebaseFirestore.instance
+        .collection('member')
+        .doc(header.userId)
+        .update({'friendList': flist});
+  }
+
+  void _alert(String text, bool cancel) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         // return object of type Dialogs
         return AlertDialog(
-          title: new Text("입력"),
-          content: new Text(text ?? "아이디 혹은 비밀번호를 입력해주세요"),
+          title: new Text("알림"),
+          content: new Text(text ?? ''),
           actions: <Widget>[
             new TextButton(
-              child: new Text("닫기"),
+              child: new Text("확인"),
               onPressed: () {
                 Navigator.pop(context);
+
+                if (cancel) {
+                  _addFriend();
+                  _alert('성공적으로 추가되었습니다', false);
+                }
               },
             ),
+            if (cancel)
+              new TextButton(
+                child: new Text("취소"),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
           ],
         );
       },
@@ -241,7 +262,8 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(height * 0.06),
         child: AppBar(
-          backgroundColor: Color(0xff1899e9),
+          backgroundColor: Colors.white,
+          //Color(0xff1899e9)
           //backgroundColor: Colors.white,
           leading: new IconButton(
             icon: new Icon(Icons.arrow_back, size: 30),
@@ -249,10 +271,18 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
               Navigator.pop(context);
             },
           ),
-          title: Text(
-            document.data()['name'],
-            textAlign: TextAlign.center,
-          ),
+          title: Text(document.data()['name'],
+              textAlign: TextAlign.center,
+              style: TextStyle(fontWeight: FontWeight.bold)),
+          elevation: 10,
+          shadowColor: Colors.black,
+          actions: [
+            IconButton(
+                icon: Icon(Icons.person_add),
+                onPressed: () {
+                  _alert('친구로 추가하시겠습니까?', true);
+                })
+          ],
         ),
       ),
       body: new GestureDetector(
