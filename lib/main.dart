@@ -137,6 +137,7 @@ class _MyHomePageState extends State<MyHomePage> {
           header.userEmail = user['email'];
           header.userName = user['name'];
           header.userId = user['id'];
+          header.phoneNum = user['phoneNum'];
 
           Navigator.push(
               context,

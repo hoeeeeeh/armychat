@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:async';
 import 'header.dart' as header;
 
@@ -355,7 +356,9 @@ class _IndiCounselState extends State<IndiCounsel> {
                       decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(100)),
                       child: ElevatedButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            _confirm();
+                          },
                           child: Text("신청하기",
                               style:
                                   TextStyle(color: Colors.white, fontSize: 17)),
@@ -363,11 +366,112 @@ class _IndiCounselState extends State<IndiCounsel> {
                               primary: Colors.black,
                               shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(30))))),
+                  SizedBox(height: 20.0),
+                  Container(
+                      width: 300,
+                      height: 50,
+                      margin: EdgeInsets.symmetric(horizontal: 50),
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(100)),
+                      child: ElevatedButton(
+                          onPressed: () => {Navigator.pop(context)},
+                          child: Text("취 소",
+                              style:
+                                  TextStyle(color: Colors.white, fontSize: 17)),
+                          style: ElevatedButton.styleFrom(
+                              primary: Colors.grey,
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(30))))),
                 ],
               )),
         )),
       ),
     );
+  }
+
+  final FirebaseFirestore firestore = FirebaseFirestore.instance;
+  bool isEmpty(String thing) {
+    if (thing == "" || thing == " ")
+      return true;
+    else
+      return false;
+  }
+
+  void _alert(String output) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        // return object of type Dialog
+        return AlertDialog(
+          title: new Text("알림"),
+          content: new Container(
+            width: 200,
+            height: 60,
+            child: new Center(
+              child: new Text(
+                output ?? 'defalut value',
+                textAlign: TextAlign.center,
+              ),
+            ),
+          ),
+          actions: <Widget>[
+            new TextButton(
+              child: new Text("닫기"),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _confirm() {
+    String output = '다음은 필수 기재 항목입니다.\n';
+    bool empty = false;
+    if (isEmpty(_nameController.text)) {
+      output += '상담소 이름';
+      empty = true;
+    }
+    if (isEmpty(_locationController.text)) {
+      if (empty) output += ',';
+      output += '지역';
+      empty = true;
+    }
+    if (isEmpty(_ageController.text)) {
+      if (empty) output += ',';
+      output += '나이';
+      empty = true;
+    }
+    if (isEmpty(_fieldController.text)) {
+      if (empty) output += ',';
+      output += '분야';
+      empty = true;
+    }
+    if (isEmpty(_introduceController.text)) {
+      if (empty) output += ',';
+      output += '소개';
+      empty = true;
+    }
+    if (empty) {
+      _alert(output);
+    } else {
+      String time = DateTime.now().toString();
+      firestore.collection('individualCouncel').doc(time).set({
+        'age': _ageController.text,
+        'field': _fieldController.text,
+        'hostId': header.userId,
+        'hostname': header.userName,
+        'introduce': _introduceController.text,
+        'location': _locationController.text,
+        'phone': header.phoneNum, //사용자 계정.text,
+        'title': _nameController.text,
+      });
+      Navigator.pop(context);
+      //idController.text = ; 나중에 회원가입하면 자동으로 로그인 창에 아이디,비번 띄워주는 옵션
+      _alert('개인 상담소 신청이 정상적으로 완료되었습니다!');
+    }
   }
 }
 

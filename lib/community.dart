@@ -1,4 +1,8 @@
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'chatBoth.dart' as chat;
+import 'header.dart' as header;
 import 'dart:math' as math;
 
 class Community extends StatefulWidget {
@@ -21,221 +25,186 @@ class _CommunityState extends State<Community> {
     '나의 상담소'
   ];
 
-  final List colorList = [
-    Colors.redAccent[100],
-    Colors.amberAccent[100],
-    Colors.lightGreenAccent[100],
-    Colors.pinkAccent[100],
-    Colors.blueAccent[100],
-    Colors.yellowAccent[100],
-    Colors.tealAccent[100],
-    Colors.purpleAccent[100],
-  ];
+  @override
+  Widget build(BuildContext context) => Scaffold(
+          body: SafeArea(
+        child: StreamBuilder(
+            stream: FirebaseFirestore.instance
+                .collection('individualCouncel')
+                .snapshots(),
+            builder: (context, snapshot) {
+              if (!snapshot.hasData) {
+                return Center(
+                  child: CircularProgressIndicator(
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.red),
+                  ),
+                );
+              } else {
+                return ListView.builder(
+                  padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
+                  itemBuilder: (context, index) =>
+                      buildCard(context, snapshot.data.documents[index], index),
+                  itemCount: snapshot.data.documents.length,
+                );
+              }
+            }),
+      ));
 
-  Widget makeText(String title, {double width, double height, double font}) { // 텍스트 만드는 함수
-    return Container(
-      child: Center(
-        child: Text(
-          title,
-          style: TextStyle(fontSize: font ?? 23.0, fontFamily: 'BMHANNAAir'),
-        ),
-      ),
-      width: width,
-      height: height,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20.0),
-        border: Border.all(width: 0.1),
-        boxShadow: [
-          BoxShadow(
-              blurRadius: 1,
-              spreadRadius: 1,
-              color: Colors.grey.withOpacity(0.5),
-              offset: Offset(0, 1))
-        ],
-      ),
+  Widget buildCard(
+          BuildContext context, DocumentSnapshot document, int index) =>
+      Card(
+          margin: EdgeInsets.fromLTRB(20, 10, 20, 10),
+          shadowColor: Colors.black.withOpacity(0.9),
+          color: Colors.white,
+          elevation: 10,
+          clipBehavior: Clip.antiAlias,
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+          child: Container(
+            padding: EdgeInsets.fromLTRB(5, 10, 5, 0),
+            child: Stack(children: [
+              //Positioned(left: 12, bottom: 18, child: Text('방문자수: ', style: TextStyle()),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CircleAvatar(
+                    radius: 35,
+                    backgroundImage: NetworkImage(
+                        'https://cdn.business2community.com/wp-content/uploads/2017/08/blank-profile-picture-973460_640.png'),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(document.data()['title'] ?? 'undefined',
+                      style:
+                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                  Padding(
+                    padding: EdgeInsets.fromLTRB(10, 5, 10, 0),
+                    child: Text(document.data()['introduce'] ?? '소개가 없습니다',
+                        style: TextStyle(
+                            fontSize: 14, fontWeight: FontWeight.normal)),
+                  ),
+                  ButtonBar(
+                    buttonPadding: EdgeInsets.all(3),
+                    alignment: MainAxisAlignment.end,
+                    children: [
+                      TextButton(
+                          child: Text(
+                            '대화하기',
+                            style: TextStyle(
+                                color: Colors.orange,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 14),
+                          ),
+                          onPressed: () {
+                            String councelHostId =
+                                document.data()['hostId'] ?? null;
+                            if (councelHostId == null)
+                              _alertError();
+                            else {
+                              FirebaseFirestore.instance
+                                  .collection('member')
+                                  .doc(councelHostId)
+                                  .get()
+                                  .then(
+                                (document) {
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              chat.ChatScreen(document)));
+                                },
+                              );
+                            }
+                          }),
+                      TextButton(
+                        child: Text(
+                          '상세보기',
+                          style: TextStyle(
+                              color: Colors.orange,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14),
+                        ),
+                        onPressed: () {
+                          _popupMenu([
+                            document.data()['title'] ?? 'undefined',
+                            document.data()['hostname'] ?? 'undefined',
+                            document.data()['age'] ?? 'undefined',
+                            document.data()['field'] ?? 'undefined',
+                            document.data()['location'] ?? 'undefined',
+                            document.data()['phone'] ?? 'undefined',
+                          ]); //각
+                        },
+                      ),
+                    ],
+                  )
+                ],
+              ),
+            ]),
+          ));
+
+  void _alertError() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        // return object of type Dialogs
+        return AlertDialog(
+          title: new Center(
+            child: Text('오류'),
+          ),
+          content: SingleChildScrollView(
+            child: Center(child: Text('유저 정보가 없습니다')),
+          ),
+          actions: <Widget>[
+            new TextButton(
+              child: new Text("닫기"),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return StackedList();
-  }
-}
-
-class StackedList extends StatelessWidget {
-  final List<Color> _colors = Colors.primaries;
-  static const _minHeight = 16.0;
-  static const _maxHeight = 120.0;
-
-  @override
-  Widget build(BuildContext context) => CustomScrollView(
-        slivers: _colors
-            .map(
-              (color) => StackedListChild(
-                minHeight: _minHeight,
-                maxHeight: _colors.indexOf(color) == _colors.length - 1
-                    ? MediaQuery.of(context).size.height
-                    : _maxHeight,
-                pinned: true,
-                child: Container(
-                  color: _colors.indexOf(color) == 0
-                      ? Colors.black
-                      : _colors[_colors.indexOf(color) - 1],
-                  child: Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.vertical(
-                          top: Radius.circular(_minHeight)),
-                      color: color,
-                    ),
-                  ),
-                ),
-              ),
-            )
-            .toList(),
-      );
-}
-
-class StackedListChild extends StatelessWidget {
-  final double minHeight;
-  final double maxHeight;
-  final bool pinned;
-  final bool floating;
-  final Widget child;
-
-  SliverPersistentHeaderDelegate get _delegate => _StackedListDelegate(
-      minHeight: minHeight, maxHeight: maxHeight, child: child);
-
-  const StackedListChild({
-    Key key,
-    @required this.minHeight,
-    @required this.maxHeight,
-    @required this.child,
-    this.pinned = false,
-    this.floating = false,
-  })  : assert(child != null),
-        assert(minHeight != null),
-        assert(maxHeight != null),
-        assert(pinned != null),
-        assert(floating != null),
-        super(key: key);
-
-  @override
-  Widget build(BuildContext context) => SliverPersistentHeader(
-      key: key, pinned: pinned, floating: floating, delegate: _delegate);
-}
-
-class _StackedListDelegate extends SliverPersistentHeaderDelegate {
-  final double minHeight;
-  final double maxHeight;
-  final Widget child;
-
-  _StackedListDelegate({
-    @required this.minHeight,
-    @required this.maxHeight,
-    @required this.child,
-  });
-
-  @override
-  double get minExtent => minHeight;
-
-  @override
-  double get maxExtent => math.max(maxHeight, minHeight);
-
-  @override
-  Widget build(
-      BuildContext context, double shrinkOffset, bool overlapsContent) {
-    return new SizedBox.expand(child: child);
-  }
-
-  @override
-  bool shouldRebuild(_StackedListDelegate oldDelegate) {
-    return maxHeight != oldDelegate.maxHeight ||
-        minHeight != oldDelegate.minHeight ||
-        child != oldDelegate.child;
-  }
-}
-
-
-// https://stackoverflow.com/questions/54494024/how-to-make-stacked-card-list-view-in-flutter
-
- /*
-    Scaffold(
-        backgroundColor: Colors.white10,
-        body: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.all(12.0),
-            child: Column(
-              children: <Widget>[
-                Align(
-                    alignment: Alignment.topCenter,
-                    heightFactor: 1.2,
-                    child: Center(
-                      child: Container(
-                        width: MediaQuery.of(context).size.width * 0.5,
-                        child: makeText(
-                          '개인 상담소',
-                          height: MediaQuery.of(context).size.height * 0.05,
-                          width: MediaQuery.of(context).size.width * 0.5,
-                        ),
-                      ),
-                    )),
-                Expanded(
-                  child: GridView.count(
-                    scrollDirection: Axis.vertical,
-                    crossAxisCount: 1,
-                    crossAxisSpacing: 10,
-                    childAspectRatio: 1.5,
-                    mainAxisSpacing: MediaQuery.of(context).size.width * 0.05,
-                    children: List.generate(themeList.length, (index) {
-                      return Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Container(
-                          decoration: BoxDecoration(
-                            /*
-                            gradient: LinearGradient(
-                              colors: [
-                                colorList[index % 8],
-                                colorList[(index + 1) % 8]
-                              ],
-                              begin: Alignment.bottomLeft,
-                              end: Alignment.topRight,
-                            ),
-                            */
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(20.0),
-                            border: Border.all(width: 0.1),
-                            boxShadow: [
-                              BoxShadow(
-                                  blurRadius: 4,
-                                  spreadRadius: 2,
-                                  color: Colors.blueGrey.withOpacity(0.5),
-                                  offset: Offset(0, 3))
-                            ],
-                          ),
-                          child: GestureDetector(
-                            onTap: (){
-                              
-                            },
-                            child: Padding(
-                              padding: const EdgeInsets.only(top: 3.0),
-                              child: Text(themeList[index],
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                    color: Colors.black.withOpacity(0.5),
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.bold,
-                                    fontFamily: 'BMHANNAAir',
-                                  )),
-                            ),
-                          ),
-                        ),
-                      );
-                    }),
-                  ),
-                )
-              ],
+  void _popupMenu(List<String> hostInfo) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        // return object of type Dialogs
+        return AlertDialog(
+          title: new Center(
+              child: Text(
+            hostInfo[0],
+            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          )),
+          content: new SingleChildScrollView(
+              child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text('호스트 : ' + hostInfo[1],
+                  textAlign: TextAlign.left, style: TextStyle(fontSize: 18)),
+              Text('나이 : ' + hostInfo[2],
+                  textAlign: TextAlign.left, style: TextStyle(fontSize: 18)),
+              Text('지역 : ' + hostInfo[3],
+                  textAlign: TextAlign.left, style: TextStyle(fontSize: 18)),
+              Text('분야 : ' + hostInfo[4],
+                  textAlign: TextAlign.left, style: TextStyle(fontSize: 18)),
+              Text('연락처 : ' + hostInfo[5],
+                  textAlign: TextAlign.left, style: TextStyle(fontSize: 18)),
+            ],
+          )),
+          actions: <Widget>[
+            new TextButton(
+              child: new Text("닫기"),
+              onPressed: () {
+                Navigator.pop(context);
+              },
             ),
-          ),
-        ));
-        */
+          ],
+        );
+      },
+    );
+  }
+}

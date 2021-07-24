@@ -54,14 +54,20 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
 
     whatSaid = [];
     getSafeAreaHeight();
+
     curUserId = header.userArmyNum.hashCode;
     oppoUserId = document.data()['armyNum'].hashCode;
+
+    print('curUserId = ' + '$curUserId');
+    print('oppoUserId = ' + '$oppoUserId');
+
     if (curUserId >= oppoUserId) {
       chatUrl = curUserId - oppoUserId;
     } else {
       chatUrl = oppoUserId - curUserId;
     }
-    isAlreadyExist();
+    isAlreadyExist(chatUrl);
+    print('chatting url = ' + '$chatUrl');
 
     firebaseStream = FirebaseFirestore.instance
         .collection('chat')
@@ -111,13 +117,22 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
     });
   }
 
-  void isAlreadyExist() async {
+  void isAlreadyExist(chatURL) async {
+    print(3);
+
     await FirebaseFirestore.instance
         .collection('member')
         .doc(header.userId)
         .get()
         .then((DocumentSnapshot ds) {
-      curChatList = ds.data()['chatList'];
+      curChatList.add(ds.data()['chatList']);
+      if (!curChatList.contains(chatURL)) curChatList.add(chatURL);
+      FirebaseFirestore.instance
+          .collection('member')
+          .doc(header.userId)
+          .update({'chatList': curChatList});
+
+      print('get my chat list asychronously');
     });
 
     await FirebaseFirestore.instance
@@ -126,29 +141,41 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
         .get()
         .then((DocumentSnapshot ds) {
       oppoChatList = ds.data()['chatList'];
+
+      if (!oppoChatList.contains(chatURL)) oppoChatList.add(chatURL);
+      FirebaseFirestore.instance
+          .collection('member')
+          .doc(document.data()['id'])
+          .update({'chatList': oppoChatList});
+      print('get opposite chat list asychronously');
     });
-
-    print('curchatList:' + '$curChatList');
-    print('chatUrl: ' + '$chatUrl');
-    if (curChatList.contains(chatUrl) || oppoChatList.contains(chatUrl)) return;
-
-    FirebaseFirestore.instance
-        .collection('chat')
-        .doc('$chatUrl')
-        .set({"whatSaid": []});
-
-    curChatList.add(chatUrl);
-    oppoChatList.add(chatUrl);
-    FirebaseFirestore.instance
-        .collection('member')
-        .doc(header.userId)
-        .update({'chatList': curChatList});
-    FirebaseFirestore.instance
-        .collection('member')
-        .doc(document.data()['id'])
-        .update({'chatList': oppoChatList});
   }
 
+/*
+  void callback() async {
+    await isAlreadyExist().then((bol) {
+      //print('curchatList:' + '$curChatList');
+      print('chatUrl: ' + '$chatUrl');
+      //if (curChatList.contains(chatUrl) || oppoChatList.contains(chatUrl)) return;
+
+      FirebaseFirestore.instance
+          .collection('chat')
+          .doc('$chatUrl')
+          .set({"whatSaid": []});
+
+      curChatList.add(chatUrl);
+      oppoChatList.add(chatUrl);
+      FirebaseFirestore.instance
+          .collection('member')
+          .doc(header.userId)
+          .set({'chatList': curChatList});
+      FirebaseFirestore.instance
+          .collection('member')
+          .doc(document.data()['id'])
+          .set({'chatList': oppoChatList});
+    });
+  }
+*/
   void _alert([String text]) {
     showDialog(
       context: context,
@@ -193,12 +220,13 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
           axisAlignment: 1.0,
           sizeFactor: animation,
           child: Padding(
-            padding: EdgeInsets.only(top: 10),
+            padding: EdgeInsets.symmetric(vertical: 5),
             child: Container(
                 alignment: mine ? Alignment.bottomRight : Alignment.bottomLeft,
                 child: Bubble(
+                  elevation: 3,
                   child: Text(chatContent),
-                  color: mine ? Colors.blue : Colors.yellow,
+                  color: mine ? Color(0xffFDFDFD) : Color(0xff1899e9),
                   padding: BubbleEdges.all(10),
                 )),
           )),
@@ -207,18 +235,13 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
 
   Widget build(BuildContext context) {
     height = MediaQuery.of(context).size.height;
-    //print(MediaQuery.of(context).size.height);
-    //print(height);
-    print('build');
-    whatSaid = [];
-    //scrollToEnd();
-    print('afterCallback');
+
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(height * 0.06),
         child: AppBar(
-          backgroundColor: Colors.amberAccent,
+          backgroundColor: Color(0xff1899e9),
           //backgroundColor: Colors.white,
           leading: new IconButton(
             icon: new Icon(Icons.arrow_back, size: 30),
@@ -227,7 +250,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
             },
           ),
           title: Text(
-            document.data()['name'] + "님 과의 대화" + '$chatUrl',
+            document.data()['name'],
             textAlign: TextAlign.center,
           ),
         ),
@@ -243,13 +266,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
               StreamBuilder<DocumentSnapshot>(
                   stream: firebaseStream,
                   builder: (context, snapshot) {
-                    //print('streamBuilder builder');
-                    //print(snapshot);
-                    //
-                    //print(snapshot.hasData);
-                    print('snapshot off');
                     if (snapshot.hasData) {
-                      print('snapshot on');
                       FirebaseFirestore.instance
                           .collection('chat')
                           .doc('$chatUrl')
@@ -258,10 +275,8 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                         //whatSaid = ds.data()['whatSaid'] ?? [];
 
                         if (ds != null && ds.data() != null) {
-                          print('aaaaa');
-                          print(ds.data());
-                          print('bbbbb');
-                          print(ds.data()['whatSaid']);
+                          //print(ds.data());
+                          //print(ds.data()['whatSaid']);
                           whatSaid = ds.data()['whatSaid'] ?? [];
                           for (var i = lastReadIndex;
                               i < whatSaid.length;
@@ -284,7 +299,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
 
                     //print('out of streamBuilder');
                     return SizedBox(
-                      height: (height * 0.90) -
+                      height: (height * 0.835) -
                           (_safeAreaHeightBottom + _safeAreaHeight) -
                           MediaQuery.of(context).viewInsets.bottom, // 키보드 올라오면
 
@@ -295,7 +310,6 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                         key: _listKey,
                         itemBuilder: (BuildContext context, int index,
                             Animation<double> animation) {
-                          //print('buildItem');
                           return _buildItem(_message[index], animation, index);
                         },
                       ),
@@ -304,7 +318,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
               Align(
                 alignment: Alignment.bottomCenter,
                 child: SizedBox(
-                  height: height * 0.08,
+                  height: height * 0.075,
                   //height: 50,
                   child: TextField(
                     //autofocus: true,
@@ -323,15 +337,24 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
 
                     controller: _queryController,
                     textInputAction: TextInputAction.send,
+
+                    //메세지 입력
                     onSubmitted: (msg) {
                       _queryController.text =
                           '<$curUserId>' + _queryController.text;
                       whatSaid.add(_queryController.text);
                       _queryController.clear();
+
+                      FirebaseFirestore.instance
+                          .collection('chat')
+                          .doc('$chatUrl')
+                          .set({"whatSaid": whatSaid});
+                      /*
                       FirebaseFirestore.instance
                           .collection('chat')
                           .doc('$chatUrl')
                           .update({"whatSaid": whatSaid});
+                      */
                     },
                   ),
                 ),
