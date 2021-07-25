@@ -27,9 +27,10 @@ String userEmail = "";
 String userArmyNum = "";
 String userId = 'id';
 String phoneNum = '010-1234-5678';
-String counselHouseName = "";
+String counselCenterName = "";
 List friendList = [];
 List chatList = [];
+var myCounselCenter;
 
 String indiCouncel = 'individualCouncel';
 

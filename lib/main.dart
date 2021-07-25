@@ -138,8 +138,18 @@ class _MyHomePageState extends State<MyHomePage> {
           header.userId = user['id'];
           header.phoneNum = user['phoneNum'];
           header.chatList = user['chatList'];
+          header.counselCenterName = user['counselCenterName'] ?? '';
           header.friendList = user['friendList'] ?? '';
 
+          if (header.counselCenterName != '') {
+            await firestore
+                .collection('individualCouncel')
+                .doc(header.counselCenterName)
+                .get()
+                .then((data) {
+              header.myCounselCenter = data.data();
+            });
+          }
           Navigator.push(
               context,
               MaterialPageRoute(

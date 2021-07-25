@@ -6,6 +6,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:async';
 import 'header.dart' as header;
 import 'profileEditor.dart';
+import 'indiCounselEditor.dart' as indi;
 
 class Setting extends StatefulWidget {
   Setting({Key key, this.title}) : super(key: key);
@@ -31,26 +32,29 @@ class _SettingState extends State<Setting> {
         children: ListTile.divideTiles(
           context: context,
           tiles: [
-            ListTile(
-                title: Text('프로필'),
-                onTap: () => Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => Profile())),
-                leading: Icon(Icons.person)),
+            _buildTile('프로필', Icons.person, Profile()),
             ListTile(
                 title: Text('개인 상담소 개설 신청'),
-                onTap: () => Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => IndiCounsel())),
+                onTap: () => {
+                      if (header.counselCenterName != '')
+                        {_alert('이미 개인 상담소가 존재합니다')}
+                      else
+                        {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => IndiCounsel()))
+                        }
+                    },
                 leading: Icon(Icons.meeting_room)),
+            _buildTile(
+                '내 상담소 관리', Icons.house_outlined, indi.IndiCounselEditor()),
             ListTile(
-                title: Text('내 상담소 관리'),
+                title: Text('상담 내역 관리'),
                 onTap: () =>
                     {}, //Navigator.push(context,MaterialPageRoute(builder: (context) => IndiCounsel())),
-                leading: Icon(Icons.menu_open)),
-            ListTile(
-                title: Text('만든 이'),
-                onTap: () => Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => MakingNotes())),
-                leading: Icon(Icons.people)),
+                leading: Icon(Icons.list_alt)),
+            _buildTile('만든 이', Icons.people, MakingNotes()),
             // ListTile(
             //   title: Text('설정 1'),
             // ),
@@ -71,6 +75,42 @@ class _SettingState extends State<Setting> {
           ],
         ).toList(),
       ))),
+    );
+  }
+
+  Widget _buildTile(String text, IconData icon, var route) => ListTile(
+      title: Text(text),
+      onTap: () => Navigator.push(
+          context, MaterialPageRoute(builder: (context) => route)),
+      leading: Icon(icon));
+
+  void _alert(String output) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        // return object of type Dialog
+        return AlertDialog(
+          title: new Text("알림"),
+          content: new Container(
+            width: 200,
+            height: 60,
+            child: new Center(
+              child: new Text(
+                output ?? 'defalut value',
+                textAlign: TextAlign.center,
+              ),
+            ),
+          ),
+          actions: <Widget>[
+            new TextButton(
+              child: new Text("닫기"),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 }
@@ -160,6 +200,7 @@ class IndiCounsel extends StatefulWidget {
 }
 
 class _IndiCounselState extends State<IndiCounsel> {
+  final _data = header.counselCenterName;
   final _nameController = TextEditingController();
   final _locationController = TextEditingController();
   final _fieldController = TextEditingController();
@@ -426,7 +467,7 @@ class _IndiCounselState extends State<IndiCounsel> {
       _alert(output);
     } else {
       String time = DateTime.now().toString();
-      firestore.collection('individualCouncel').doc(time).set({
+      header.myCounselCenter = {
         'age': _ageController.text,
         'field': _fieldController.text,
         'hostId': header.userId,
@@ -435,8 +476,21 @@ class _IndiCounselState extends State<IndiCounsel> {
         'location': _locationController.text,
         'phone': header.phoneNum, //사용자 계정.text,
         'title': _nameController.text,
-      });
+      };
+      firestore
+          .collection('individualCouncel')
+          .doc(time)
+          .set(header.myCounselCenter);
+      header.counselCenterName = time;
+
+      firestore
+          .collection('member')
+          .doc(header.userId)
+          .update({'counselCenterName': time});
       Navigator.pop(context);
+      Navigator.push(context,
+          MaterialPageRoute(builder: (context) => indi.IndiCounselEditor()));
+
       //idController.text = ; 나중에 회원가입하면 자동으로 로그인 창에 아이디,비번 띄워주는 옵션
       _alert('개인 상담소 신청이 정상적으로 완료되었습니다!');
     }
@@ -468,7 +522,27 @@ class _ProfileState extends State<Profile> {
 
   @override
   Widget build(BuildContext context) {
+    double height = MediaQuery.of(context).size.height;
     return Scaffold(
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(height * 0.06),
+        child: AppBar(
+          backgroundColor: Colors.white,
+          //Color(0xff1899e9)
+          //backgroundColor: Colors.white,
+          leading: new IconButton(
+            icon: new Icon(Icons.arrow_back, size: 30),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
+          title: Text('프로필 관리',
+              textAlign: TextAlign.center,
+              style: TextStyle(fontWeight: FontWeight.bold)),
+          elevation: 10,
+          shadowColor: Colors.black,
+        ),
+      ),
       body: SingleChildScrollView(
         child: SafeArea(
           child: Container(
