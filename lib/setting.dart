@@ -42,6 +42,11 @@ class _SettingState extends State<Setting> {
                     MaterialPageRoute(builder: (context) => IndiCounsel())),
                 leading: Icon(Icons.meeting_room)),
             ListTile(
+                title: Text('내 상담소 관리'),
+                onTap: () =>
+                    {}, //Navigator.push(context,MaterialPageRoute(builder: (context) => IndiCounsel())),
+                leading: Icon(Icons.menu_open)),
+            ListTile(
                 title: Text('만든 이'),
                 onTap: () => Navigator.push(context,
                     MaterialPageRoute(builder: (context) => MakingNotes())),

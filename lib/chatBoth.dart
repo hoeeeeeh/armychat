@@ -98,162 +98,6 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
     */
   }
 
-  @override
-  void dispose() {
-    super.dispose();
-    _keyboardVisibility.removeListener(_keyboardVisibilitySubscriberId);
-  }
-
-  Future<void> getSafeAreaHeight() async {
-    double safeAreaHeight = 0;
-    double safeAreaHeightBottom = 0;
-
-    safeAreaHeight = await SafeAreaHeight.safeAreaHeightTop;
-    safeAreaHeightBottom = await SafeAreaHeight.safeAreaHeightBottom;
-
-    setState(() {
-      _safeAreaHeight = safeAreaHeight;
-      _safeAreaHeightBottom = safeAreaHeightBottom;
-    });
-  }
-
-  void isAlreadyExist(chatURL) async {
-    await FirebaseFirestore.instance
-        .collection('member')
-        .doc(header.userId)
-        .get()
-        .then((DocumentSnapshot ds) {
-      curChatList = ds.data()['chatList'];
-      if (!curChatList.contains(chatURL)) curChatList.add(chatURL);
-      FirebaseFirestore.instance
-          .collection('member')
-          .doc(header.userId)
-          .update({'chatList': curChatList});
-
-      print('get my chat list asychronously');
-    });
-
-    await FirebaseFirestore.instance
-        .collection('member')
-        .doc(document.data()['id'])
-        .get()
-        .then((DocumentSnapshot ds) {
-      oppoChatList = ds.data()['chatList'];
-
-      if (!oppoChatList.contains(chatURL)) oppoChatList.add(chatURL);
-      FirebaseFirestore.instance
-          .collection('member')
-          .doc(document.data()['id'])
-          .update({'chatList': oppoChatList});
-      print('get opposite chat list asychronously');
-    });
-  }
-
-/*
-  void callback() async {
-    await isAlreadyExist().then((bol) {
-      //print('curchatList:' + '$curChatList');
-      print('chatUrl: ' + '$chatUrl');
-      //if (curChatList.contains(chatUrl) || oppoChatList.contains(chatUrl)) return;
-
-      FirebaseFirestore.instance
-          .collection('chat')
-          .doc('$chatUrl')
-          .set({"whatSaid": []});
-
-      curChatList.add(chatUrl);
-      oppoChatList.add(chatUrl);
-      FirebaseFirestore.instance
-          .collection('member')
-          .doc(header.userId)
-          .set({'chatList': curChatList});
-      FirebaseFirestore.instance
-          .collection('member')
-          .doc(document.data()['id'])
-          .set({'chatList': oppoChatList});
-    });
-  }
-*/
-
-  void _addFriend() {
-    var flist = header.friendList ?? [];
-    flist.add(document.data()['id']);
-
-    FirebaseFirestore.instance
-        .collection('member')
-        .doc(header.userId)
-        .update({'friendList': flist});
-  }
-
-  void _alert(String text, bool cancel) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        // return object of type Dialogs
-        return AlertDialog(
-          title: new Text("알림"),
-          content: new Text(text ?? ''),
-          actions: <Widget>[
-            new TextButton(
-              child: new Text("확인"),
-              onPressed: () {
-                Navigator.pop(context);
-
-                if (cancel) {
-                  _addFriend();
-                  _alert('성공적으로 추가되었습니다', false);
-                }
-              },
-            ),
-            if (cancel)
-              new TextButton(
-                child: new Text("취소"),
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-              ),
-          ],
-        );
-      },
-    );
-  }
-
-  void _insertSingleItem(ChatMessage message) {
-    //String contents = message.text;
-    //_message.add(message);
-    _message.insert(0, message);
-    _listKey.currentState.insertItem(0);
-  }
-
-  Widget _buildItem(ChatMessage item, Animation animation, int index) {
-    String chatContent = item.text;
-    bool mine;
-
-    if (mine = chatContent.startsWith('<$curUserId>')) {
-      chatContent = chatContent.replaceFirst('<$curUserId>', '');
-    } else {
-      chatContent = chatContent.replaceFirst('<$oppoUserId>', '');
-    }
-    //print(chatContent);
-    //print(chatContent);
-    return SafeArea(
-      child: SizeTransition(
-          axisAlignment: 1.0,
-          sizeFactor: animation,
-          child: Padding(
-            padding: EdgeInsets.symmetric(vertical: 5),
-            child: Container(
-                alignment: mine ? Alignment.bottomRight : Alignment.bottomLeft,
-                child: Bubble(
-                  elevation: 3,
-                  child: Text(chatContent),
-                  color: mine ? Color(0xffFDFDFD) : Color(0xff1899e9),
-                  padding: BubbleEdges.all(10),
-                )),
-          )),
-    );
-  }
-
   Widget build(BuildContext context) {
     height = MediaQuery.of(context).size.height;
 
@@ -276,13 +120,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
               style: TextStyle(fontWeight: FontWeight.bold)),
           elevation: 10,
           shadowColor: Colors.black,
-          actions: [
-            IconButton(
-                icon: Icon(Icons.person_add),
-                onPressed: () {
-                  _alert('친구로 추가하시겠습니까?', true);
-                })
-          ],
+          actions: [buildFriendIcon(document.data()['id'])],
         ),
       ),
       body: new GestureDetector(
@@ -393,6 +231,225 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
           ),
         )),
       ),
+    );
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _keyboardVisibility.removeListener(_keyboardVisibilitySubscriberId);
+  }
+
+  Future<void> getSafeAreaHeight() async {
+    double safeAreaHeight = 0;
+    double safeAreaHeightBottom = 0;
+
+    safeAreaHeight = await SafeAreaHeight.safeAreaHeightTop;
+    safeAreaHeightBottom = await SafeAreaHeight.safeAreaHeightBottom;
+
+    setState(() {
+      _safeAreaHeight = safeAreaHeight;
+      _safeAreaHeightBottom = safeAreaHeightBottom;
+    });
+  }
+
+  bool isFriend(String id) {
+    var flist = header.friendList;
+    print('flist' + '$flist');
+
+    if (flist.contains(id)) return true;
+    return false;
+  }
+
+  void isAlreadyExist(chatURL) async {
+    await FirebaseFirestore.instance
+        .collection('member')
+        .doc(header.userId)
+        .get()
+        .then((DocumentSnapshot ds) {
+      curChatList = ds.data()['chatList'];
+      if (!curChatList.contains(chatURL)) curChatList.add(chatURL);
+      FirebaseFirestore.instance
+          .collection('member')
+          .doc(header.userId)
+          .update({'chatList': curChatList});
+
+      print('get my chat list asychronously');
+    });
+
+    await FirebaseFirestore.instance
+        .collection('member')
+        .doc(document.data()['id'])
+        .get()
+        .then((DocumentSnapshot ds) {
+      oppoChatList = ds.data()['chatList'];
+
+      if (!oppoChatList.contains(chatURL)) oppoChatList.add(chatURL);
+      FirebaseFirestore.instance
+          .collection('member')
+          .doc(document.data()['id'])
+          .update({'chatList': oppoChatList});
+      print('get opposite chat list asychronously');
+    });
+  }
+
+/*
+  void callback() async {
+    await isAlreadyExist().then((bol) {
+      //print('curchatList:' + '$curChatList');
+      print('chatUrl: ' + '$chatUrl');
+      //if (curChatList.contains(chatUrl) || oppoChatList.contains(chatUrl)) return;
+
+      FirebaseFirestore.instance
+          .collection('chat')
+          .doc('$chatUrl')
+          .set({"whatSaid": []});
+
+      curChatList.add(chatUrl);
+      oppoChatList.add(chatUrl);
+      FirebaseFirestore.instance
+          .collection('member')
+          .doc(header.userId)
+          .set({'chatList': curChatList});
+      FirebaseFirestore.instance
+          .collection('member')
+          .doc(document.data()['id'])
+          .set({'chatList': oppoChatList});
+    });
+  }
+*/
+
+  Widget buildFriendIcon(id) {
+    print('id' + id);
+    if (!isFriend(id)) {
+      return IconButton(
+          icon: Icon(Icons.person_add_alt_outlined),
+          onPressed: () {
+            _alert('친구로 추가하시겠습니까?');
+          });
+    } else {
+      return IconButton(
+          icon: Icon(Icons.person),
+          onPressed: () {
+            _deleteAlert('친구목록에서 삭제하시겠습니까?', id);
+          });
+    }
+  }
+
+  void _deleteAlert(String text, String id) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        // return object of type Dialogs
+        return AlertDialog(
+          title: new Text("알림"),
+          content: new Text(text ?? ''),
+          actions: <Widget>[
+            new TextButton(
+              child: new Text("확인"),
+              onPressed: () {
+                Navigator.pop(context);
+                deleteFriend(id);
+              },
+            ),
+            new TextButton(
+              child: new Text("취소"),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void deleteFriend(String id) {
+    if (header.friendList.contains(id)) {
+      setState(() {
+        header.friendList.remove(id);
+      });
+      FirebaseFirestore.instance
+          .collection('member')
+          .doc(header.userId)
+          .update({'friendList': header.friendList});
+    }
+  }
+
+  void _addFriend() {
+    var flist = header.friendList ?? [];
+    flist.add(document.data()['id']);
+    setState(() {
+      flist = header.friendList;
+    });
+
+    FirebaseFirestore.instance
+        .collection('member')
+        .doc(header.userId)
+        .update({'friendList': flist});
+  }
+
+  void _alert(String text) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        // return object of type Dialogs
+        return AlertDialog(
+          title: new Text("알림"),
+          content: new Text(text ?? ''),
+          actions: <Widget>[
+            new TextButton(
+              child: new Text("확인"),
+              onPressed: () {
+                Navigator.pop(context);
+                _addFriend();
+              },
+            ),
+            new TextButton(
+              child: new Text("취소"),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _insertSingleItem(ChatMessage message) {
+    //String contents = message.text;
+    //_message.add(message);
+    _message.insert(0, message);
+    _listKey.currentState.insertItem(0);
+  }
+
+  Widget _buildItem(ChatMessage item, Animation animation, int index) {
+    String chatContent = item.text;
+    bool mine;
+
+    if (mine = chatContent.startsWith('<$curUserId>')) {
+      chatContent = chatContent.replaceFirst('<$curUserId>', '');
+    } else {
+      chatContent = chatContent.replaceFirst('<$oppoUserId>', '');
+    }
+    //print(chatContent);
+    //print(chatContent);
+    return SafeArea(
+      child: SizeTransition(
+          axisAlignment: 1.0,
+          sizeFactor: animation,
+          child: Padding(
+            padding: EdgeInsets.symmetric(vertical: 5),
+            child: Container(
+                alignment: mine ? Alignment.bottomRight : Alignment.bottomLeft,
+                child: Bubble(
+                  elevation: 3,
+                  child: Text(chatContent),
+                  color: mine ? Color(0xffFDFDFD) : Color(0xff1899e9),
+                  padding: BubbleEdges.all(10),
+                )),
+          )),
     );
   }
 }

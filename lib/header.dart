@@ -27,6 +27,7 @@ String userEmail = "";
 String userArmyNum = "";
 String userId = 'id';
 String phoneNum = '010-1234-5678';
+String counselHouseName = "";
 List friendList = [];
 List chatList = [];
 
