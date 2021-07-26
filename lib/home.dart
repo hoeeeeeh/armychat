@@ -43,13 +43,13 @@ class _HomepageState extends State<Homepage> {
   }
 
   Future<void> init() async {
-    final temp = await firestore.collection("member").doc(id).get();
+    final myDocument = await firestore.collection("member").doc(id).get();
 
-    counselCount = temp.data()['counselCount'] ?? 0;
-    int count = 0;
+    List myCounselList = myDocument.data()['counselList'] ?? [];
+
     String title = "";
 
-    if (counselCount == 0 && mounted) {
+    if (myCounselList.length == 0 && mounted) {
       // mounted == 위젯 트리 안에 현재 남아있을 경우
       print('yes');
       setState(() {
@@ -62,22 +62,17 @@ class _HomepageState extends State<Homepage> {
       return;
     }
 
-    for (int i = 0; i < counselCount; i++) {
-      count = i + 1;
+    for (int i = 0; i < myCounselList.length; i++) {
+      final counselElem =
+          await firestore.collection("expert").doc(myCounselList[i]).get();
 
-      final temp2 = await firestore
-          .collection("member")
-          .doc(id)
-          .collection('counsel')
-          .doc('counsel#($count)')
-          .get();
+      title = counselElem.data()['title'] ?? "untitled";
 
-      title = temp2.data()['title'];
       if (mounted) {
         setState(() {
           counselList.add(
             ListTile(
-                title: Text('상담#$count :: $title'),
+                title: Text('상담#$i :: $title'),
                 leading: i == 0
                     ? Icon(Icons.bookmark)
                     : Icon(Icons.bookmark_border_outlined)),

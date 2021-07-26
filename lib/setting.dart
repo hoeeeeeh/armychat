@@ -7,6 +7,8 @@ import 'dart:async';
 import 'header.dart' as header;
 import 'profileEditor.dart';
 import 'indiCounselEditor.dart' as indi;
+import 'counsellorMenu.dart' as counsellorMenu;
+import 'counselManage.dart' as counselManager;
 
 class Setting extends StatefulWidget {
   Setting({Key key, this.title}) : super(key: key);
@@ -48,11 +50,16 @@ class _SettingState extends State<Setting> {
                     },
                 leading: Icon(Icons.meeting_room)),
             _buildTile(
-                '내 상담소 관리', Icons.house_outlined, indi.IndiCounselEditor()),
+                '개인 상담소 관리', Icons.house_outlined, indi.IndiCounselEditor()),
             ListTile(
-                title: Text('상담 내역 관리'),
-                onTap: () =>
-                    {}, //Navigator.push(context,MaterialPageRoute(builder: (context) => IndiCounsel())),
+                title: Text('상담 내역'),
+                onTap: () => {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) =>
+                                  counselManager.CounselManage())),
+                    },
                 leading: Icon(Icons.list_alt)),
             _buildTile('만든 이', Icons.people, MakingNotes()),
             // ListTile(
@@ -65,6 +72,28 @@ class _SettingState extends State<Setting> {
                   //await header._auth.signOut();
                 },
                 leading: Icon(Icons.exit_to_app)),
+
+//permission이 1이면 상담사 계정, 상담사한테만 보이는 메뉴
+            if (header.permission == 1)
+              Container(
+                padding: EdgeInsets.all(10),
+                child: Center(
+                    child: Text(
+                  '상담사 메뉴',
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                )),
+              ),
+            if (header.permission == 1)
+              ListTile(
+                  title: Text('상담 관리'),
+                  onTap: () => {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) =>
+                                    counsellorMenu.CounsellorMenu())),
+                      },
+                  leading: Icon(Icons.list_alt)),
 
             ListTile(
               title: Text(

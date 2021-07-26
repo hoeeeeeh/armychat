@@ -140,6 +140,7 @@ class _MyHomePageState extends State<MyHomePage> {
           header.chatList = user['chatList'];
           header.counselCenterName = user['counselCenterName'] ?? '';
           header.friendList = user['friendList'] ?? '';
+          header.permission = user['permission'] ?? 0;
 
           if (header.counselCenterName != '') {
             await firestore
@@ -174,9 +175,7 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Center(
-              child: Text('3'),
-            ),
+            //Center(child: Text('3'),),
             Container(
               constraints: BoxConstraints(
                 maxHeight: MediaQuery.of(context).size.height,

@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_signin_button/button_list.dart';
+import 'header.dart' as header;
 
 class CounSel extends StatefulWidget {
   //CounSel({Key key, this.title}) : super(key: key);
@@ -43,11 +44,18 @@ class _CounSelState extends State<CounSel> {
   }
 
   Future<void> init() async {
+    /*
     final temp = await firestore.collection("member").doc(id).get();
     _email = temp.data()['email'];
     _phone = temp.data()['phoneNum'];
     _armyNum = temp.data()['armyNum'];
     _name = temp.data()['name'];
+    */
+
+    _email = header.userEmail;
+    _phone = header.phoneNum;
+    _armyNum = header.userArmyNum;
+    _name = header.userName;
   }
 
   @override
@@ -64,34 +72,38 @@ class _CounSelState extends State<CounSel> {
 
   bool wantClear = false;
 
-  Future<void> _submit(String title, String email, String content,
+  Future<void> _submit(
+      String id, bool isAnonymous, String title, String email, String content,
       [String name, String phoneNum, String armyNum]) async {
     print('id : $id');
     print(name);
-    final temp = await firestore.collection("member").doc(id).get();
-    int counselCount = temp.data()['counselCount'] ?? 0;
-    counselCount++;
+    final myData = await firestore.collection("member").doc(id).get();
 
-    String str = 'counsel#($counselCount)';
+    String time = DateTime.now().toString();
+    var form = {
+      'anonymous': isAnonymous,
+      'armyNum': !isAnonymous ? armyNum : 'anonymous',
+      'content': content,
+      'email': email,
+      'name': !isAnonymous ? name : 'anonymous',
+      'phone': !isAnonymous ? phoneNum : 'anonymous',
+      'title': title,
+      'userId': id,
+      'replylist': [],
+      'replierlist': [],
+    };
+
+    List newList = myData.data()['counselList'] ?? [];
+    newList.add(time);
+
     await firestore
         .collection("member")
         .doc(id)
-        .collection("counsel")
-        .doc(str)
-        .set({
-      'title': title,
-      'content': content,
-      'email': email,
-      'name': name != "" ? name : 'anonymous',
-      'phoneNum': phoneNum != "" ? phoneNum : 'anonymous',
-      'armyNum': armyNum != "" ? armyNum : 'anonymous',
-    });
+        .update({'counselList': newList});
+
+    await firestore.collection("expert").doc(time).set(form);
 
     _alert('상담 접수가 완료되었습니다.');
-    firestore
-        .collection('member')
-        .doc(id)
-        .update({'counselCount': counselCount});
   }
 
   void _alert(String output) {
@@ -383,6 +395,8 @@ class _CounSelState extends State<CounSel> {
                             MaterialStateProperty.all(Colors.white)),
                     onPressed: () => {
                           _submit(
+                              header.userId,
+                              anonyCheck,
                               titleController.text,
                               emailController.text,
                               textController.text,
