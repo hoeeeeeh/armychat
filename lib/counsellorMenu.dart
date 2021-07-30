@@ -289,6 +289,7 @@ class CounsellorReplyState extends State<CounsellorReply> {
 
   List _replyList = [];
   List _replierList = [];
+  List _replierNameList = [];
   String _userId; //사용자 계정
   String _userName;
   String _userEmail;
@@ -310,6 +311,7 @@ class CounsellorReplyState extends State<CounsellorReply> {
 
     _replyList = data['replylist'] ?? [];
     _replierList = data['replierlist'] ?? [];
+    _replierNameList = data['repliername'] ?? [];
   }
 
   @override
@@ -528,9 +530,11 @@ class CounsellorReplyState extends State<CounsellorReply> {
     String ref = docu.id;
     _replyList.add(__reply);
     _replierList.add(header.userId);
-    FirebaseFirestore.instance
-        .collection('expert')
-        .doc(ref)
-        .update({'replylist': _replyList, 'replierlist': _replierList});
+    _replierNameList.add(header.userName);
+    FirebaseFirestore.instance.collection('expert').doc(ref).update({
+      'replylist': _replyList,
+      'replierlist': _replierList,
+      'repliername': _replierNameList
+    });
   }
 }

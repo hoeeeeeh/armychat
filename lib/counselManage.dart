@@ -277,10 +277,15 @@ class CounselManageState extends State<CounselManage> {
 
       for (int count = 0; count < _replyList.length; ++count) {
         String ___reply = _replyList[count];
+
+        print(___reply);
         String ___replier = _replierList[count];
         ___replier = ___replier != '' ? ___replier : '익명';
+
+        print(___replier);
         String ___replierName = _replierNameList[count];
         ___replierName = ___replierName != '' ? ___replierName : '익명';
+        print(___replierName);
 
         counselList.add(Container(
           margin: EdgeInsets.fromLTRB(20, 5, 125, 5),

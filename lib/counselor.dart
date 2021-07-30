@@ -91,6 +91,7 @@ class _CounSelState extends State<CounSel> {
       'userId': id,
       'replylist': [],
       'replierlist': [],
+      'repliername': [],
     };
 
     List newList = myData.data()['counselList'] ?? [];
