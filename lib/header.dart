@@ -31,7 +31,7 @@ String counselCenterName = "";
 int permission = 0;
 List friendList = [];
 List chatList = [];
-var myCounselCenter;
+var myCounselCenter = null;
 
 String indiCouncel = 'individualCouncel';
 

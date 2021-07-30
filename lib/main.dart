@@ -137,9 +137,9 @@ class _MyHomePageState extends State<MyHomePage> {
           header.userName = user['name'];
           header.userId = user['id'];
           header.phoneNum = user['phoneNum'];
-          header.chatList = user['chatList'];
+          header.chatList = user['chatList'] ?? [];
           header.counselCenterName = user['counselCenterName'] ?? '';
-          header.friendList = user['friendList'] ?? '';
+          header.friendList = user['friendList'] ?? [];
           header.permission = user['permission'] ?? 0;
 
           if (header.counselCenterName != '') {
@@ -150,7 +150,9 @@ class _MyHomePageState extends State<MyHomePage> {
                 .then((data) {
               header.myCounselCenter = data.data();
             });
-          }
+          } else
+            header.myCounselCenter = null;
+
           Navigator.push(
               context,
               MaterialPageRoute(

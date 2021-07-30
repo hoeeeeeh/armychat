@@ -19,7 +19,10 @@ class IndiCounselEditorState extends State<IndiCounselEditor> {
   void initState() {
     super.initState();
 
-    if (header.myCounselCenter != null) myData = header.myCounselCenter;
+    if (header.myCounselCenter != null)
+      myData = header.myCounselCenter;
+    else
+      myData = null;
   }
 
   @override
