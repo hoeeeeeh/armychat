@@ -43,13 +43,14 @@ class _HomepageState extends State<Homepage> {
   }
 
   Future<void> init() async {
-    final temp = await firestore.collection("member").doc(id).get();
+    final myDocument = await firestore.collection("member").doc(id).get();
 
-    counselCount = temp.data()['counselCount'] ?? 0;
-    int count = 0;
+    List myCounselList = myDocument.data()['counselList'] ?? [];
+
     String title = "";
 
-    if (counselCount == 0 && mounted) { // mounted == 위젯 트리 안에 현재 남아있을 경우
+    if (myCounselList.length == 0 && mounted) {
+      // mounted == 위젯 트리 안에 현재 남아있을 경우
       print('yes');
       setState(() {
         counselList.add(ListTile(
@@ -61,22 +62,17 @@ class _HomepageState extends State<Homepage> {
       return;
     }
 
-    for (int i = 0; i < counselCount; i++) {
-      count = i + 1;
+    for (int i = 0; i < myCounselList.length; i++) {
+      final counselElem =
+          await firestore.collection("expert").doc(myCounselList[i]).get();
 
-      final temp2 = await firestore
-          .collection("member")
-          .doc(id)
-          .collection('counsel')
-          .doc('counsel#($count)')
-          .get();
+      title = counselElem.data()['title'] ?? "untitled";
 
-      title = temp2.data()['title'];
       if (mounted) {
         setState(() {
           counselList.add(
             ListTile(
-                title: Text('상담#$count :: $title'),
+                title: Text('상담#$i :: $title'),
                 leading: i == 0
                     ? Icon(Icons.bookmark)
                     : Icon(Icons.bookmark_border_outlined)),
@@ -93,46 +89,70 @@ class _HomepageState extends State<Homepage> {
     isDisposed = true;
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        body: SingleChildScrollView(
-            child: SizedBox(
-          //width: 400,
-          child: Column(
-            children: [
-              Padding(
-                padding: EdgeInsets.only(bottom: 20),
+  //앱 종료를 한번 더 물어보는 함수
+  Future<bool> _onWillPop() async {
+    return (await showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text('종료'),
+            content: Text('정말로 앱을 종료하시겠습니까?'),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(false),
+                child: Text('아니요'),
               ),
-              Center(child: Text(userName + '님(' + email + ') 어서오세요.')),
-              Padding(padding: EdgeInsets.only(bottom: 20)),
-              Container(
-                padding: EdgeInsets.only(top: 20.0),
-                child: Text('내 상담 확인하기'),
-                decoration: BoxDecoration(
-                    border: Border(
-                        bottom: BorderSide(
-                  color: Colors.black,
-                  width: 2.0,
-                ))),
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(true),
+                child: Text('예'),
               ),
-              TableCalendar(
-                calendarController: _calendarController,
-              ),
-              SizedBox(
-                height: 600,
-                child: Center(
-                    child: ListView(
-                  children: ListTile.divideTiles(
-                    context: context,
-                    tiles: counselList,
-                  ).toList(),
-                )),
-              )
             ],
           ),
-        )),
+        )) ??
+        false;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return WillPopScope(
+      onWillPop: () {
+        return _onWillPop();
+      },
+      child: SafeArea(
+        child: Scaffold(
+          body: SingleChildScrollView(
+              child: SizedBox(
+            //width: 400,
+            child: Column(
+              children: [
+                Padding(
+                  padding: EdgeInsets.only(bottom: 20),
+                ),
+                Divider(),
+                Center(child: Text(userName + '님(' + email + ') 어서오세요.')),
+                Divider(),
+                Padding(padding: EdgeInsets.only(bottom: 20)),
+                TableCalendar(
+                  calendarController: _calendarController,
+                ),
+                Divider(),
+                Container(
+                  padding: EdgeInsets.only(top: 20.0),
+                  child: Text('내 상담 일정', style: TextStyle(fontSize: 16)),
+                ),
+                SizedBox(
+                  height: 600,
+                  child: Center(
+                      child: ListView(
+                    children: ListTile.divideTiles(
+                      context: context,
+                      tiles: counselList,
+                    ).toList(),
+                  )),
+                )
+              ],
+            ),
+          )),
+        ),
       ),
     );
   }

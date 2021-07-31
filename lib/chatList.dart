@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'const.dart';
 import 'chatBoth.dart' as chat;
+import 'header.dart' as header;
 
 class ChatList extends StatefulWidget {
   @override
@@ -17,27 +18,31 @@ class _ChatListState extends State<ChatList> {
       builder: (BuildContext context) {
         // return object of type Dialogs
         return AlertDialog(
-          title: new Text("메뉴"),
+          title: Center(
+              child: new Text(
+            text,
+            style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+          )),
           content: new SingleChildScrollView(
               child: Column(
             children: [
               ListTile(
                 title: Text(
-                  '친구 삭제',
+                  '삭제',
                   textAlign: TextAlign.center,
                 ),
                 onTap: () {},
               ),
               ListTile(
                 title: Text(
-                  '친구 1',
+                  '차단',
                   textAlign: TextAlign.center,
                 ),
                 onTap: () {},
               ),
               ListTile(
                 title: Text(
-                  '친구 2',
+                  '수신 거부',
                   textAlign: TextAlign.center,
                 ),
                 onTap: () {},
@@ -71,8 +76,10 @@ class _ChatListState extends State<ChatList> {
           } else {
             return ListView.builder(
               padding: EdgeInsets.all(10.0),
-              itemBuilder: (context, index) =>
-                  buildItem(context, snapshot.data.documents[index]),
+              itemBuilder: (context, index) {
+                var item = snapshot.data.documents[index];
+                return buildItem(context, item);
+              },
               itemCount: snapshot.data.documents.length,
             );
           }
@@ -98,7 +105,7 @@ class _ChatListState extends State<ChatList> {
         );
       },
       onLongPress: () {
-        _popupMenu('long press');
+        _popupMenu(document.data()['name']);
       },
     );
   }

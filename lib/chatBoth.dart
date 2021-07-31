@@ -54,14 +54,20 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
 
     whatSaid = [];
     getSafeAreaHeight();
-    curUserId = header.userArmyNum.hashCode;
-    oppoUserId = document.data()['armyNum'].hashCode;
+
+    curUserId = header.userId.hashCode;
+    oppoUserId = document.data()['id'].hashCode;
+
+    print('curUserId = ' + '$curUserId');
+    print('oppoUserId = ' + '$oppoUserId');
+
     if (curUserId >= oppoUserId) {
       chatUrl = curUserId - oppoUserId;
     } else {
       chatUrl = oppoUserId - curUserId;
     }
-    isAlreadyExist();
+    isAlreadyExist(chatUrl);
+    print('chatting url = ' + '$chatUrl');
 
     firebaseStream = FirebaseFirestore.instance
         .collection('chat')
@@ -92,6 +98,142 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
     */
   }
 
+  Widget build(BuildContext context) {
+    height = MediaQuery.of(context).size.height;
+
+    return Scaffold(
+      resizeToAvoidBottomInset: false,
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(height * 0.06),
+        child: AppBar(
+          backgroundColor: Colors.white,
+          //Color(0xff1899e9)
+          //backgroundColor: Colors.white,
+          leading: new IconButton(
+            icon: new Icon(Icons.arrow_back, size: 30),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
+          title: Text(document.data()['name'],
+              textAlign: TextAlign.center,
+              style: TextStyle(fontWeight: FontWeight.bold)),
+          elevation: 10,
+          shadowColor: Colors.black,
+          actions: [buildFriendIcon(document.data()['id'])],
+        ),
+      ),
+      body: new GestureDetector(
+        onTap: () {
+          FocusScope.of(context).unfocus();
+        },
+        child: SafeArea(
+            child: SingleChildScrollView(
+          child: Column(
+            children: [
+              StreamBuilder<DocumentSnapshot>(
+                  stream: firebaseStream,
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData) {
+                      FirebaseFirestore.instance
+                          .collection('chat')
+                          .doc('$chatUrl')
+                          .get()
+                          .then((DocumentSnapshot ds) {
+                        //whatSaid = ds.data()['whatSaid'] ?? [];
+
+                        if (ds != null && ds.data() != null) {
+                          //print(ds.data());
+                          //print(ds.data()['whatSaid']);
+                          whatSaid = ds.data()['whatSaid'] ?? [];
+                          for (var i = lastReadIndex;
+                              i < whatSaid.length;
+                              i++) {
+                            _insertSingleItem(ChatMessage(
+                              text: whatSaid[i] ?? '그런거 없쪙',
+                              animationController: AnimationController(
+                                duration: Duration(milliseconds: 700),
+                                vsync: this,
+                              ),
+                            ));
+                          }
+                          //print(whatSaid);
+                          lastReadIndex = (whatSaid.length);
+                          //print(whatSaid.length - 1);
+                        }
+                        //return Future<String>
+                      });
+                    }
+
+                    //print('out of streamBuilder');
+                    return SizedBox(
+                      height: (height * 0.835) -
+                          (_safeAreaHeightBottom + _safeAreaHeight) -
+                          MediaQuery.of(context).viewInsets.bottom, // 키보드 올라오면
+
+                      child: AnimatedList(
+                        controller: _scrollController,
+                        shrinkWrap: true,
+                        reverse: true,
+                        key: _listKey,
+                        itemBuilder: (BuildContext context, int index,
+                            Animation<double> animation) {
+                          return _buildItem(_message[index], animation, index);
+                        },
+                      ),
+                    );
+                  }),
+              Align(
+                alignment: Alignment.bottomCenter,
+                child: SizedBox(
+                  height: height * 0.075,
+                  //height: 50,
+                  child: TextField(
+                    //autofocus: true,
+                    decoration: InputDecoration(
+                      prefixIcon: Icon(
+                        Icons.message,
+                        color: Colors.grey,
+                      ),
+                      hintText: "채팅을 입력해주세요.",
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(0),
+                      ),
+                      filled: true,
+                      fillColor: Color(0xFFe7edeb),
+                    ),
+
+                    controller: _queryController,
+                    textInputAction: TextInputAction.send,
+
+                    //메세지 입력
+                    onSubmitted: (msg) {
+                      _queryController.text =
+                          '<$curUserId>' + _queryController.text;
+                      whatSaid.add(_queryController.text);
+                      _queryController.clear();
+
+                      FirebaseFirestore.instance
+                          .collection('chat')
+                          .doc('$chatUrl')
+                          .set({"whatSaid": whatSaid});
+                      /*
+                      FirebaseFirestore.instance
+                          .collection('chat')
+                          .doc('$chatUrl')
+                          .update({"whatSaid": whatSaid});
+                      */
+                    },
+                  ),
+                ),
+              ),
+            ],
+          ),
+        )),
+      ),
+    );
+  }
+
   @override
   void dispose() {
     super.dispose();
@@ -111,13 +253,28 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
     });
   }
 
-  void isAlreadyExist() async {
+  bool isFriend(String id) {
+    var flist = header.friendList;
+    print('flist' + '$flist');
+
+    if (flist.contains(id)) return true;
+    return false;
+  }
+
+  void isAlreadyExist(chatURL) async {
     await FirebaseFirestore.instance
         .collection('member')
         .doc(header.userId)
         .get()
         .then((DocumentSnapshot ds) {
       curChatList = ds.data()['chatList'];
+      if (!curChatList.contains(chatURL)) curChatList.add(chatURL);
+      FirebaseFirestore.instance
+          .collection('member')
+          .doc(header.userId)
+          .update({'chatList': curChatList});
+
+      print('get my chat list asychronously');
     });
 
     await FirebaseFirestore.instance
@@ -126,40 +283,130 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
         .get()
         .then((DocumentSnapshot ds) {
       oppoChatList = ds.data()['chatList'];
+
+      if (!oppoChatList.contains(chatURL)) oppoChatList.add(chatURL);
+      FirebaseFirestore.instance
+          .collection('member')
+          .doc(document.data()['id'])
+          .update({'chatList': oppoChatList});
+      print('get opposite chat list asychronously');
     });
-
-    print('curchatList:' + '$curChatList');
-    print('chatUrl: ' + '$chatUrl');
-    if (curChatList.contains(chatUrl) || oppoChatList.contains(chatUrl)) return;
-
-    FirebaseFirestore.instance
-        .collection('chat')
-        .doc('$chatUrl')
-        .set({"whatSaid": []});
-
-    curChatList.add(chatUrl);
-    oppoChatList.add(chatUrl);
-    FirebaseFirestore.instance
-        .collection('member')
-        .doc(header.userId)
-        .update({'chatList': curChatList});
-    FirebaseFirestore.instance
-        .collection('member')
-        .doc(document.data()['id'])
-        .update({'chatList': oppoChatList});
   }
 
-  void _alert([String text]) {
+/*
+  void callback() async {
+    await isAlreadyExist().then((bol) {
+      //print('curchatList:' + '$curChatList');
+      print('chatUrl: ' + '$chatUrl');
+      //if (curChatList.contains(chatUrl) || oppoChatList.contains(chatUrl)) return;
+
+      FirebaseFirestore.instance
+          .collection('chat')
+          .doc('$chatUrl')
+          .set({"whatSaid": []});
+
+      curChatList.add(chatUrl);
+      oppoChatList.add(chatUrl);
+      FirebaseFirestore.instance
+          .collection('member')
+          .doc(header.userId)
+          .set({'chatList': curChatList});
+      FirebaseFirestore.instance
+          .collection('member')
+          .doc(document.data()['id'])
+          .set({'chatList': oppoChatList});
+    });
+  }
+*/
+
+  Widget buildFriendIcon(id) {
+    print('id' + id);
+    if (!isFriend(id)) {
+      return IconButton(
+          icon: Icon(Icons.person_add_alt_outlined),
+          onPressed: () {
+            _alert('친구로 추가하시겠습니까?');
+          });
+    } else {
+      return IconButton(
+          icon: Icon(Icons.person),
+          onPressed: () {
+            _deleteAlert('친구목록에서 삭제하시겠습니까?', id);
+          });
+    }
+  }
+
+  void _deleteAlert(String text, String id) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         // return object of type Dialogs
         return AlertDialog(
-          title: new Text("입력"),
-          content: new Text(text ?? "아이디 혹은 비밀번호를 입력해주세요"),
+          title: new Text("알림"),
+          content: new Text(text ?? ''),
           actions: <Widget>[
             new TextButton(
-              child: new Text("닫기"),
+              child: new Text("확인"),
+              onPressed: () {
+                Navigator.pop(context);
+                deleteFriend(id);
+              },
+            ),
+            new TextButton(
+              child: new Text("취소"),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void deleteFriend(String id) {
+    if (header.friendList.contains(id)) {
+      setState(() {
+        header.friendList.remove(id);
+      });
+      FirebaseFirestore.instance
+          .collection('member')
+          .doc(header.userId)
+          .update({'friendList': header.friendList});
+    }
+  }
+
+  void _addFriend() {
+    var flist = header.friendList ?? [];
+    flist.add(document.data()['id']);
+    setState(() {
+      flist = header.friendList;
+    });
+
+    FirebaseFirestore.instance
+        .collection('member')
+        .doc(header.userId)
+        .update({'friendList': flist});
+  }
+
+  void _alert(String text) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        // return object of type Dialogs
+        return AlertDialog(
+          title: new Text("알림"),
+          content: new Text(text ?? ''),
+          actions: <Widget>[
+            new TextButton(
+              child: new Text("확인"),
+              onPressed: () {
+                Navigator.pop(context);
+                _addFriend();
+              },
+            ),
+            new TextButton(
+              child: new Text("취소"),
               onPressed: () {
                 Navigator.pop(context);
               },
@@ -193,142 +440,16 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
           axisAlignment: 1.0,
           sizeFactor: animation,
           child: Padding(
-            padding: EdgeInsets.only(top: 10),
+            padding: EdgeInsets.symmetric(vertical: 5),
             child: Container(
                 alignment: mine ? Alignment.bottomRight : Alignment.bottomLeft,
                 child: Bubble(
+                  elevation: 3,
                   child: Text(chatContent),
-                  color: mine ? Colors.blue : Colors.yellow,
+                  color: mine ? Color(0xffFDFDFD) : Color(0xff1899e9),
                   padding: BubbleEdges.all(10),
                 )),
           )),
-    );
-  }
-
-  Widget build(BuildContext context) {
-    height = MediaQuery.of(context).size.height;
-    //print(MediaQuery.of(context).size.height);
-    //print(height);
-    print('build');
-    whatSaid = [];
-    //scrollToEnd();
-    print('afterCallback');
-    return Scaffold(
-      resizeToAvoidBottomInset: false,
-      appBar: PreferredSize(
-        preferredSize: Size.fromHeight(height * 0.05),
-        child: AppBar(
-          //backgroundColor: Colors.white,
-          leading: new IconButton(
-            icon: new Icon(Icons.arrow_back, size: 30),
-            onPressed: () {
-              Navigator.pop(context);
-            },
-          ),
-          title: Text(
-            document.data()['name'] + "님 과의 대화" + '$chatUrl',
-            textAlign: TextAlign.center,
-          ),
-        ),
-      ),
-      body: new GestureDetector(
-        onTap: () {
-          FocusScope.of(context).unfocus();
-        },
-        child: SafeArea(
-            child: Column(
-          children: [
-            StreamBuilder<DocumentSnapshot>(
-                stream: firebaseStream,
-                builder: (context, snapshot) {
-                  //print('streamBuilder builder');
-                  //print(snapshot);
-                  //
-                  //print(snapshot.hasData);
-                  print('snapshot off');
-                  if (snapshot.hasData) {
-                    print('snapshot on');
-                    FirebaseFirestore.instance
-                        .collection('chat')
-                        .doc('$chatUrl')
-                        .get()
-                        .then((DocumentSnapshot ds) {
-                      //whatSaid = ds.data()['whatSaid'] ?? [];
-
-                      if (ds != null && ds.data() != null) {
-                        print('aaaaa');
-                        print(ds.data());
-                        print('bbbbb');
-                        print(ds.data()['whatSaid']);
-                        whatSaid = ds.data()['whatSaid'] ?? [];
-                        for (var i = lastReadIndex; i < whatSaid.length; i++) {
-                          _insertSingleItem(ChatMessage(
-                            text: whatSaid[i] ?? '그런거 없쪙',
-                            animationController: AnimationController(
-                              duration: Duration(milliseconds: 700),
-                              vsync: this,
-                            ),
-                          ));
-                        }
-                        //print(whatSaid);
-                        lastReadIndex = (whatSaid.length);
-                        //print(whatSaid.length - 1);
-                      }
-                      //return Future<String>
-                    });
-                  }
-
-                  //print('out of streamBuilder');
-                  return SizedBox(
-                    height: (height * 0.90) -
-                        (_safeAreaHeightBottom + _safeAreaHeight) -
-                        MediaQuery.of(context).viewInsets.bottom, // 키보드 올라오면
-
-                    child: AnimatedList(
-                      controller: _scrollController,
-                      shrinkWrap: true,
-                      reverse: true,
-                      key: _listKey,
-                      itemBuilder: (BuildContext context, int index,
-                          Animation<double> animation) {
-                        //print('buildItem');
-                        return _buildItem(_message[index], animation, index);
-                      },
-                    ),
-                  );
-                }),
-            Align(
-              alignment: Alignment.bottomCenter,
-              child: SizedBox(
-                height: height * 0.05,
-                //height: 50,
-                child: TextField(
-                  //autofocus: true,
-                  decoration: InputDecoration(
-                    icon: Icon(
-                      Icons.message,
-                      color: Colors.greenAccent,
-                    ),
-                    hintText: "채팅을 입력해주세요.",
-                  ),
-                  controller: _queryController,
-                  textInputAction: TextInputAction.send,
-                  onSubmitted: (msg) {
-                    _queryController.text =
-                        '<$curUserId>' + _queryController.text;
-                    whatSaid.add(_queryController.text);
-                    _queryController.clear();
-                    FirebaseFirestore.instance
-                        .collection('chat')
-                        .doc('$chatUrl')
-                        .update({"whatSaid": whatSaid});
-                  },
-                ),
-              ),
-            ),
-          ],
-        )),
-      ),
     );
   }
 }

@@ -26,6 +26,14 @@ String userName = "이름";
 String userEmail = "";
 String userArmyNum = "";
 String userId = 'id';
+String phoneNum = '010-1234-5678';
+String counselCenterName = "";
+int permission = 0;
+List friendList = [];
+List chatList = [];
+var myCounselCenter = null;
+
+String indiCouncel = 'individualCouncel';
 
 final FirebaseAuth _auth = FirebaseAuth.instance;
 

@@ -3,7 +3,7 @@ import 'setting.dart' as setting;
 import 'community.dart' as community;
 //import 'chatbot.dart' as bot;
 import 'home.dart' as home;
-import 'chatList.dart' as chatList;
+//import 'chatList.dart' as chatList;
 import 'friend.dart' as friend;
 import 'counselor.dart' as counselor;
 import 'package:flutter_icons/flutter_icons.dart';
@@ -41,7 +41,7 @@ class _UserinfoState extends State<Userinfo> {
       community.Community(),
       home.Homepage(id, userName, email),
       counselor.CounSel(id),
-      chatList.ChatList(),
+      //chatList.ChatList(),
       setting.Setting(),
     ];
   }
@@ -68,7 +68,7 @@ class _UserinfoState extends State<Userinfo> {
           BottomNavigationBarItem(
             backgroundColor: Colors.pinkAccent[100],
             icon: Icon(Icons.people_rounded),
-            label: '상담친구',
+            label: '내 친구',
           ),
           BottomNavigationBarItem(
             backgroundColor: Colors.lightBlueAccent[400],
@@ -83,7 +83,7 @@ class _UserinfoState extends State<Userinfo> {
           BottomNavigationBarItem(
             backgroundColor: Colors.blueAccent[100],
             icon: Icon(AntDesign.smile_circle),
-            label: '상담관과 상담하기',
+            label: '상담신청',
           ),
 
           /*
@@ -94,11 +94,13 @@ class _UserinfoState extends State<Userinfo> {
             label: '실시간 상담',
           ),
           */
+          /*
           BottomNavigationBarItem(
             backgroundColor: Colors.redAccent[100],
             icon: Icon(AntDesign.message1),
             label: '채팅',
           ),
+          */
           BottomNavigationBarItem(
             backgroundColor: Colors.grey,
             icon: Icon(Icons.settings),

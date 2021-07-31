@@ -147,6 +147,9 @@ class _SignInState extends State<SignIn> {
         'name': nameController.text,
         'counselCount': 0,
         'chatList': [],
+        'friendList': [],
+        'counselCenterName': '',
+        'permission': 0
       });
       Navigator.pop(context);
       //idController.text = ; 나중에 회원가입하면 자동으로 로그인 창에 아이디,비번 띄워주는 옵션
