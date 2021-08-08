@@ -29,6 +29,15 @@ subprojects {
 subprojects {
     project.evaluationDependsOn(':app')
 }
+subprojects {
+    afterEvaluate { project ->
+        if (project.name == "keyboard_visibility" || project.name == "safe_area_height") {
+            android {
+                compileSdkVersion 28
+            }
+        }
+    }
+}
 
 task clean(type: Delete) {
     delete rootProject.buildDir
