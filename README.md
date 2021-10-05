@@ -1,6 +1,6 @@
 # army_chatbot
 
-육군 규정 상담 챗봇 
+육군 상담 앱
 
 ## Getting Started
 
