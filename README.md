@@ -1,4 +1,4 @@
-# army_chatbot
+# army_chat
 
 육군 상담 앱
 
